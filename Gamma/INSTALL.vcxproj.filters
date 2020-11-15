@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\saada\Desktop\New folder (2)\Gamma2\CMakeFiles\e9d8cc999643a3129fd3c22d8d322a6d\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{3E1124B1-1ADA-398C-919A-A2D984505E86}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
