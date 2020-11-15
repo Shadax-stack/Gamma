@@ -386,6 +386,7 @@ FodyWeavers.xsd
 
 *.sln
 *.vcxproj
+*.vcxproj.filters
 
 CMakeLists.txt.user
 CMakeCache.txt
