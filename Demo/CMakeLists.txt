@@ -1,6 +1,6 @@
 file(GLOB Demo_SRC
-    "**.h"
-    "**.cpp"
+    "src/**.h"
+    "src/**.cpp"
 )
 
 add_executable(Demo ${Demo_SRC})
