@@ -8,9 +8,11 @@ namespace Gamma {
 
 	class GAMMA_API Renderer {
 	public:
-		void CreateContxt(Window* window);
+		void CreateContext(Gamma::Window* window);
 		void FreeContext(void);
+		void SwapBuffers(void);
 	private:
+		Window* Window;
 		SDL_GLContext Context;
 	};
 
