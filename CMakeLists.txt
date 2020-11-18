@@ -8,6 +8,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 project(Gamma)
 
-add_subdirectory(vendor/SDL2)
+add_subdirectory(vendor)
 add_subdirectory(Gamma)
 add_subdirectory(Demo)

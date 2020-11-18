@@ -1,3 +1,6 @@
+// Copyright (c) 2020 Shadax-stack <shadax32@gmail.com>
+// This file is subject to the terms and conditions defined in
+// file 'LICENSE.txt', which is part of this source code package.
 #ifndef GAMMA_WINDOW_H
 #define GAMMA_WINDOW_H
 #include "../Gamma.h"
@@ -7,16 +10,16 @@
 
 namespace Gamma {
 
-	enum FullscreenState {
-		GAMMA_FULLSCREEN_STATE_WINDOWED = 0,
-		GAMMA_FULLSCREEN_STATE_WINDOWED_FULLSCREEN = SDL_WINDOW_FULLSCREEN,
-		GAMMA_FULLSCREEN_STATE_FULLSCREEN = SDL_WINDOW_FULLSCREEN_DESKTOP
+	enum class FullscreenState {
+		WINDOWED = 0,
+		WINDOWED_FULLSCREEN = SDL_WINDOW_FULLSCREEN,
+		FULLSCREEN = SDL_WINDOW_FULLSCREEN_DESKTOP
 	};
 
-	enum WindowState {
-		GAMMA_WINDOW_STATE_CLOSED = false,
-		GAMMA_WINDOW_STATE_OPEN = true,
-		GAMMA_WINDOW_STATE_HIDDEN,
+	enum class WindowState {
+		CLOSED = false,
+		OPEN = true,
+		HIDDEN = SDL_WINDOW_HIDDEN,
 	};
 
 	struct GAMMA_API WindowClass {
@@ -41,6 +44,7 @@ namespace Gamma {
 		void CloseWindow(void);
 		void PollEvents(void);
 		WindowState GetState(void);
+		bool ShouldClose(void);
 	private:
 		WindowClass WndClass;
 		SDL_Window* pWindow;
