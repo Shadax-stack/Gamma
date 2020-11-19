@@ -9,3 +9,7 @@ set_target_properties(spdlog PROPERTIES FOLDER vendor)
 add_subdirectory(Krypton)
 set_target_properties(Krypton_STATIC PROPERTIES FOLDER vendor/Krypton)
 set_target_properties(Krypton_SHARED PROPERTIES FOLDER vendor/Krypton)
+
+add_subdirectory(GLEW)
+set_target_properties(libglew_static PROPERTIES FOLDER vendor/GLEW)
+set_target_properties(libglew_shared PROPERTIES FOLDER vendor/GLEW)

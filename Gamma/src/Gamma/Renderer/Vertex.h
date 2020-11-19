@@ -6,7 +6,10 @@
 
 namespace Gamma {
 
-
+	struct GAMMA_API Vertex {
+	public:
+		Krypton::Vector3f Position;
+	};
 
 }
 

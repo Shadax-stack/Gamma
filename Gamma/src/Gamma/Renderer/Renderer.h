@@ -6,6 +6,12 @@
 
 #include "../Gamma.h"
 #include "../Window/Window.h"
+#ifdef GAMMA_GRAPHICS_API_DIRECT_X
+#include <d3d12.h>
+#include <d3d11.h>
+#include <d3d9.h>
+#endif
+#include <Krypton.h>
 
 namespace Gamma {
 
@@ -14,6 +20,9 @@ namespace Gamma {
 		void CreateContext(Gamma::Window* window);
 		void FreeContext(void);
 		void SwapBuffers(void);
+		void ClearColor(const Krypton::Vector4f color);
+		void NewFrame(void);
+		void EndFrame(void);
 	private:
 		Window* Window;
 		SDL_GLContext Context;

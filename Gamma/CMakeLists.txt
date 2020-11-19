@@ -9,16 +9,19 @@ file(GLOB Gamma_SRC
     "src/Gamma/Renderer/*.cpp"
 ) 
 
-add_library(Gamma STATIC ${Gamma_SRC})
+
 
 option(GAMMA_SHARED_LIBRARY "Build Gamma as a shared library" OFF)
 if(GAMMA_SHARED_LIBRARY)
+	add_library(Gamma SHARED ${Gamma_SRC})
 	target_compile_definitions(Gamma PUBLIC GAMMA_SHARED_LIBRARY)
+else(GAMMA_SHARED_LIBRARY)
+	add_library(Gamma STATIC ${Gamma_SRC})
 endif(GAMMA_SHARED_LIBRARY)
 	
 
-target_link_libraries(Gamma PRIVATE SDL2-static Krypton_STATIC)
-target_include_directories(Gamma PUBLIC "${CMAKE_SOURCE_DIR}/vendor/SDL2/include" "${CMAKE_SOURCE_DIR}/vendor/Krypton/src")
+target_link_libraries(Gamma PRIVATE SDL2-static Krypton_STATIC libglew_static)
+target_include_directories(Gamma PUBLIC "${CMAKE_SOURCE_DIR}/vendor/SDL2/include" "${CMAKE_SOURCE_DIR}/vendor/Krypton/src" "${CMAKE_SOURCE_DIR}/vendor/GLEW/include")
 target_link_libraries(Gamma PUBLIC spdlog)
 target_compile_definitions(Gamma PRIVATE GAMMA_BUILD=1)
 
@@ -30,6 +33,7 @@ if(WIN32)
 				GAMMA_GRAPHICS_API_DIRECT_X9
 				GAMMA_GRAPHICS_API_DIRECT_X11
 				GAMMA_GRAPHICS_API_DIRECT_X12)
+		target_link_libraries(Gamma PRIVATE "d3d9" "d3d11" "d3d12" "dxgi" "d3dcompiler")
 	target_link_libraries(Gamma PRIVATE msvcrtd vcruntimed ucrtd)
 endif(WIN32)
 

@@ -7,3 +7,6 @@
 [submodule "vendor/Krypton"]
 	path = vendor/Krypton
 	url = https://github.com/Shadax-stack/Krypton
+[submodule "vendor/GLEW"]
+	path = vendor/GLEW
+	url = https://github.com/Perlmint/glew-cmake
