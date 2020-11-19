@@ -17,8 +17,8 @@ if(GAMMA_SHARED_LIBRARY)
 endif(GAMMA_SHARED_LIBRARY)
 	
 
-target_link_libraries(Gamma PRIVATE SDL2-static)
-target_include_directories(Gamma PUBLIC ${CMAKE_SOURCE_DIR}/vendor/SDL2/include)
+target_link_libraries(Gamma PRIVATE SDL2-static Krypton_STATIC)
+target_include_directories(Gamma PUBLIC "${CMAKE_SOURCE_DIR}/vendor/SDL2/include" "${CMAKE_SOURCE_DIR}/vendor/Krypton/src")
 target_link_libraries(Gamma PUBLIC spdlog)
 target_compile_definitions(Gamma PRIVATE GAMMA_BUILD=1)
 

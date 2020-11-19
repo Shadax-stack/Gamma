@@ -5,3 +5,7 @@ set_target_properties(SDL2-static PROPERTIES FOLDER vendor/SDL2)
 
 add_subdirectory(spdlog)
 set_target_properties(spdlog PROPERTIES FOLDER vendor)
+
+add_subdirectory(Krypton)
+set_target_properties(Krypton_STATIC PROPERTIES FOLDER vendor/Krypton)
+set_target_properties(Krypton_SHARED PROPERTIES FOLDER vendor/Krypton)
