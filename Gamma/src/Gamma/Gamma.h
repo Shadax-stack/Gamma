@@ -4,18 +4,23 @@
 #ifndef GAMMA_H
 #define GAMMA_H
 
+#ifdef GAMMA_SHARED_LIBRARY
+#ifdef GAMMA_MSVC
+#define GAMMA_EXPORT _declspec(dllexport)
+#define GAMMA_IMPORT _declspec(dllimport)
+#else
+#define GAMMA_EXPORT __attribute__((visibility("default")))
+#define GAMMA_IMPORT
+#endif
+#else
+#define GAMMA_EXPORT 
+#define GAMMA_IMPORT
+#endif
+
 #ifdef GAMMA_BUILD
-#ifdef GAMMA_MSVC
-#define GAMMA_API _declspec(dllexport)
-#else 
-#define GAMMA_API __attribute__((visibility("default")))
-#endif
+#define GAMMA_API GAMMA_EXPORT
 #else
-#ifdef GAMMA_MSVC
-#define GAMMA_API _declspec(dllimport)
-#else
-#define GAMMA_API
-#endif
+#define GAMMA_API GAMMA_IMPORT
 #endif
 
 #define SDL_main_h_

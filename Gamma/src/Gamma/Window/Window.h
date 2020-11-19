@@ -7,18 +7,19 @@
 #include <SDL.h>
 #include <stdint.h>
 #include <queue>
+#include <spdlog/spdlog.h>
 
 namespace Gamma {
 
 	enum class FullscreenState {
 		WINDOWED = 0,
-		WINDOWED_FULLSCREEN = SDL_WINDOW_FULLSCREEN,
+		FULLSCREEN_WINDOWED = SDL_WINDOW_FULLSCREEN,
 		FULLSCREEN = SDL_WINDOW_FULLSCREEN_DESKTOP
 	};
 
 	enum class WindowState {
-		CLOSED = false,
-		OPEN = true,
+		CLOSED = 0,
+		OPEN = SDL_WINDOW_SHOWN,
 		HIDDEN = SDL_WINDOW_HIDDEN,
 	};
 

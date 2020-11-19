@@ -8,9 +8,11 @@ using namespace Gamma;
 int main() {
 	GammaInit();
 	WindowClass WndClass;
-	WndClass.FullscreenState = FullscreenState::FULLSCREEN;
+	WndClass.FullscreenState = FullscreenState::WINDOWED;
 	Window Window;
-	Window.OpenWindow(WndClass, "Gamma", 1280, 720);
+	Window.OpenWindow(WndClass, "Gamma", 1920, 1080);
+	Renderer Renderer;
+	Renderer.CreateContext(&Window);
 	while (!Window.ShouldClose()) {
 		Window.PollEvents();
 	}

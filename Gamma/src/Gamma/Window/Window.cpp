@@ -48,7 +48,7 @@ namespace Gamma {
 	}
 
 	bool Window::ShouldClose(void) {
-		return (bool)GetState();
+		return GetState() == WindowState::CLOSED;
 	}
 
 }
