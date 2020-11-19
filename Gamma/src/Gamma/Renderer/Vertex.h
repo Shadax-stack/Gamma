@@ -2,7 +2,7 @@
 #define GAMMA_VERTEX_H
 
 #include "../Gamma.h"
-#include 
+#include <Krypton.h>
 
 namespace Gamma {
 
