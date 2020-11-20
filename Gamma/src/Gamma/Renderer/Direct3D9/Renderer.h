@@ -5,6 +5,7 @@
 #include "../../Window/Window.h"
 #include <d3d9.h>
 #include <Krypton.h>
+#include <stdint.h>
 
 namespace Gamma {
 
@@ -15,12 +16,14 @@ namespace Gamma {
 			void CreateContext(Gamma::Window* window);
 			void FreeContext(void);
 			void SwapBuffers(void);
-			void ClearColor(const Krypton::Vector4f color);
+			void Clear(const Krypton::Vector4f color, float depth = 1.0f, uint8_t stencil = 255);
 			void NewFrame(void);
 			void EndFrame(void);
 		private:
+			void RecoverDevice(LPDIRECT3DDEVICE9 device);
 			Window* Window;
 			LPDIRECT3DDEVICE9 Device;
+			D3DPRESENT_PARAMETERS DevicePresentParameters;
 		};
 
 	}

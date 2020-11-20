@@ -33,9 +33,9 @@ namespace Gamma {
 #define GAMMA_WARN(fmt, ...) Gamma::GlobalLogger.Warn(fmt, __VA_ARGS__)
 #define GAMMA_ERROR(fmt, ...) Gamma::GlobalLogger.Error(fmt, __VA_ARGS__)
 #define GAMMA_CRITICAL(fmt, ...) Gamma::GlobalLogger.Critical(fmt, __VA_ARGS__)
-#define GAMMA_ASSERT_INFO(fmt, ...) if(!(condition)) { GAMMA_INFO(fmt, __VA_ARGS__); psnip_trap(); }
-#define GAMMA_ASSERT_WARN(fmt, ...) if(!(condition)) { GAMMA_WARN(fmt, __VA_ARGS__); psnip_trap(); }
-#define GAMMA_ASSERT_ERROR(fmt, ...) if(!(condition)) { GAMMA_ERROR(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT_INFO(condition, fmt, ...) if(!(condition)) { GAMMA_INFO(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT_WARN(condition, fmt, ...) if(!(condition)) { GAMMA_WARN(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT_ERROR(condition, fmt, ...) if(!(condition)) { GAMMA_ERROR(fmt, __VA_ARGS__); psnip_trap(); }
 #define GAMMA_ASSERT_CRITICAL(condition, fmt, ...) if(!(condition)) { GAMMA_CRITICAL(fmt, __VA_ARGS__); psnip_trap(); }
 #define GAMMA_ASSERT GAMMA_ASSERT_CRITICAL
 #else

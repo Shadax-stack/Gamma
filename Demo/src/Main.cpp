@@ -1,6 +1,6 @@
 #include <Gamma/Gamma.h>
 #include <Gamma/Window/Window.h>
-#include <Gamma/Renderer/OpenGL/Renderer.h>
+#include <Gamma/Renderer/Renderer.h>
 #include <iostream>
 
 using namespace Gamma;

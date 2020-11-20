@@ -33,17 +33,19 @@ namespace Gamma {
 			SDL_GL_SwapWindow(Window->pWindow);
 		}
 
-		void Renderer::ClearColor(const Krypton::Vector4f color) {
-			//glClearBufferfv(GL_COLOR, 0, (const float*)&color);
+		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
+			glClearBufferfv(GL_COLOR, 0, (const float*)&color);
+			glClearBufferfv(GL_DEPTH, 0, (const float*)&depth);
+			glClearBufferiv(GL_STENCIL, 0, (const int*)&stencil);
 		}
 
 		void Renderer::NewFrame(void) {
 			Krypton::Vector4f defaultColor;
-			defaultColor.r = 1.0f;
-			defaultColor.g = 1.0f;
-			defaultColor.b = 1.0f;
-			defaultColor.a = 1.0f;
-			ClearColor(defaultColor);
+			defaultColor.r = 0.0f;
+			defaultColor.g = 0.0f;
+			defaultColor.b = 0.0f;
+			defaultColor.a = 0.0f;
+			Clear(defaultColor);
 		}
 
 		void Renderer::EndFrame(void) {

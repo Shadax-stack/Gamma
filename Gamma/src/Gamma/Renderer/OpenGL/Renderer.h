@@ -14,7 +14,7 @@ namespace Gamma {
 			void CreateContext(Gamma::Window* window);
 			void FreeContext(void);
 			void SwapBuffers(void);
-			void ClearColor(const Krypton::Vector4f color);
+			void Clear(const Krypton::Vector4f color, float depth = 1.0f, uint8_t stencil = 255);
 			void NewFrame(void);
 			void EndFrame(void);
 		private:
