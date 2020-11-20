@@ -8,3 +8,6 @@
 	path = vendor/portable-snippets
 	url = https://github.com/nemequ/portable-snippets
 
+[submodule "vendor/GLEW"]
+	path = vendor/GLEW
+	url = https://github.com/Perlmint/glew-cmake
