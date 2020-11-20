@@ -50,9 +50,6 @@ target_compile_definitions(Gamma PUBLIC "-DGAMMA_BUILD=1")
 
 target_compile_definitions(Gamma PUBLIC "$<$<CONFIG:DEBUG>:GAMMA_DEBUG>")
 
-
-
-
 if(WIN32)
 	target_compile_definitions(Gamma PUBLIC GAMMA_PLATFORM_WINDOWS)
 	if(MSVC)
@@ -62,7 +59,6 @@ if(WIN32)
 		target_link_libraries(Gamma PRIVATE "$<$<CONFIG:RELWITHDEBINFO>:${GAMMA_DEBUG_LIBS}>")
 		target_link_libraries(Gamma PRIVATE "$<$<CONFIG:RELEASE>:${GAMMA_RELEASE_LIBS}>")
 		target_link_libraries(Gamma PRIVATE "$<$<CONFIG:MINSIZEREL>:${GAMMA_RELEASE_LIBS}>")
-
 	endif(MSVC)
 endif(WIN32)
 
