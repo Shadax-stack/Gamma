@@ -1,70 +1,55 @@
 // Copyright (c) 2020 Shadax-stack <shadax32@gmail.com>
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
+
+// The logging approach is based on Hazel, however I make a few changes such as there being only the core logger as well as a global logger
 #ifndef GAMMA_LOG_H
 #define GAMMA_LOG_H
 
 #include "../Gamma.h"
-#include <stdio.h>
-#include <string>
-#include <vector>
+#include <stdint.h>
+#include <debug-trap/debug-trap.h>
 
 namespace Gamma {
 
-	enum class MessageType {
-		INFO,  // Should be used for information
-		WARN,  // Should be used for warning
-		ERROR, // Should be used for a recoverable error
-		FATAL, // Should be used for an unrecoverable error 
-	};
-
-	//A message itself
-	struct GAMMA_API Message {
-	public:
-		Message(const std::string& msg, MessageType type = MessageType::INFO);
-		Message(void);
-		uint64_t Time; //Time in nanoseconds since we are using a 64-bit integer anyway
-		std::string Content; //Content of the message
-		MessageType Type;
-	};
-
-	struct GAMMA_API MessageStream {
-	public:
-		MessageStream(void);
-		MessageStream(size_t size);
-		~MessageStream(void);
-		char* Data;
-		size_t Size;
-	};
-
-	//A wrapper for a ostream that outputs to something like the console or a file
-	struct GAMMA_API MessageOutput {
-	public:
-		MessageOutput(FILE* out, const char* format = "C\n");
-		MessageOutput(const MessageOutput& copy);
-		MessageOutput(const std::string& path, const char* format = "C\n");
-		MessageOutput(const MessageStream& stream, const char* format = "C\n");
-		void SendMessage(const Message& msg);
-		void SendMessage(const std::string& msg);
-		void SetFormat(const std::string& newFormat);
-		MessageOutput& operator<<(const Message& msg);
-		MessageOutput& operator<<(const std::string& msg);
-		MessageOutput& operator=(const MessageOutput& copy);
-	private:
-		FILE* Output; //Handle to the file
-		std::string Format; //Format for the log
-		std::string FormatMessage(const Message& msg);
-	};
-
 	class GAMMA_API Logger {
 	public:
-		void AddOutput(MessageOutput& output);
-		void SendMessage(const std::string& msg);
-		Logger& operator<<(const std::string& msg);
-	private:
-		std::vector<MessageOutput> Outputs;
+		void Info(const char* fmt, ...);
+		void Warn(const char* fmt, ...);
+		void Error(const char* fmt, ...);
+		void Critical(const char* fmt, ...);
 	};
 
+#ifdef GAMMA_DEBUG
+	extern GAMMA_API Logger GlobalLogger;
+#endif
+
 }
+
+#ifdef GAMMA_BUILD
+#ifdef GAMMA_DEBUG
+// Macros for logging in a debug build
+#define GAMMA_INFO(fmt, ...) Gamma::GlobalLogger.Info(fmt, __VA_ARGS__)
+#define GAMMA_WARN(fmt, ...) Gamma::GlobalLogger.Warn(fmt, __VA_ARGS__)
+#define GAMMA_ERROR(fmt, ...) Gamma::GlobalLogger.Error(fmt, __VA_ARGS__)
+#define GAMMA_CRITICAL(fmt, ...) Gamma::GlobalLogger.Critical(fmt, __VA_ARGS__)
+#define GAMMA_ASSERT_INFO(fmt, ...) if(!(condition)) { GAMMA_INFO(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT_WARN(fmt, ...) if(!(condition)) { GAMMA_WARN(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT_ERROR(fmt, ...) if(!(condition)) { GAMMA_ERROR(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT_CRITICAL(condition, fmt, ...) if(!(condition)) { GAMMA_CRITICAL(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_ASSERT GAMMA_ASSERT_CRITICAL
+#else
+// Generally we don't want any logging in a release or distribution build
+#define GAMMA_INFO(fmt, ...) 
+#define GAMMA_WARN(fmt, ...) 
+#define GAMMA_ERROR(fmt, ...) 
+#define GAMMA_CRITICAL(fmt, ...) 
+#define GAMMA_ASSERT_INFO(fmt, ...) 
+#define GAMMA_ASSERT_WARN(fmt, ...) 
+#define GAMMA_ASSERT_ERROR(fmt, ...) 
+#define GAMMA_ASSERT_CRITICAL(condition, fmt, ...)
+#define GAMMA_ASSERT GAMMA_ASSERT_CRITICAL
+#endif
+#endif
 
 #endif

@@ -2,8 +2,11 @@
 // This file is subject to the terms and conditions defined in
 // file 'LICENSE.txt', which is part of this source code package.
 #include "Window.h"
+#include "../Core/Log.h"
 #include <iostream>
 #include <vector>
+
+#define WINDOW_GRAPHICS_API_FLAG SDL_WINDOW_OPENGL
 
 namespace Gamma {
 
@@ -11,12 +14,21 @@ namespace Gamma {
 
 	WindowEvent::WindowEvent(const SDL_Event event) : EventData(event) {}
 
+	Window::~Window(void) {
+		//We need this destructor so that program does not crash at the end when objects are being freed for some reason
+	}
+
 	void Window::OpenWindow(WindowClass wndclass, const char* title, int32_t width, int32_t height, int32_t xpos, int32_t ypos) {
 		WndClass = wndclass;
-		pWindow = SDL_CreateWindow(title, xpos, ypos, width, height, (uint32_t)WndClass.FullscreenState || (uint32_t)WndClass.WindowState);
+		pWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WINDOW_GRAPHICS_API_FLAG);
+		GAMMA_ASSERT(pWindow, "Fatal error in creating window: %s", SDL_GetError());
+		GAMMA_INFO("Created window %i of size %i by %i", SDL_GetWindowID(pWindow), width, height);
+		Width = (int)width;
+		Height = (int)height;
 	}
 
 	void Window::CloseWindow(void) {
+		GAMMA_INFO("Destroying window %i", SDL_GetWindowID(pWindow));
 		SDL_DestroyWindow(pWindow);
 	}
 
@@ -35,7 +47,7 @@ namespace Gamma {
 						WndClass.WindowState = WindowState::CLOSED;
 					} break; 
 					default: {
-						EventQueue.push(Event);
+						EventQueue.emplace_back(Event);
 					} break;
 				}
 			} else {

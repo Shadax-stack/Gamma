@@ -6,10 +6,18 @@
 #include "../Gamma.h"
 #include <SDL.h>
 #include <stdint.h>
-#include <queue>
-#include <spdlog/spdlog.h>
+#include <vector>
 
 namespace Gamma {
+
+	//Pre-declare any freind classes we may be using
+	namespace OpenGL {
+		class Renderer;
+	}
+
+	namespace Direct3D9 {
+		class Renderer;
+	}
 
 	enum class FullscreenState {
 		WINDOWED = 0,
@@ -41,6 +49,7 @@ namespace Gamma {
 
 	class GAMMA_API Window {
 	public:
+		~Window(void);
 		void OpenWindow(WindowClass wndclass, const char* title, int32_t width, int32_t height, int32_t xpos = 0, int32_t ypos = 30);
 		void CloseWindow(void);
 		void PollEvents(void);
@@ -49,8 +58,10 @@ namespace Gamma {
 	private:
 		WindowClass WndClass;
 		SDL_Window* pWindow;
-		std::queue<WindowEvent> EventQueue;
-		friend class Renderer;
+		std::vector<WindowEvent> EventQueue;
+		int Width, Height;
+		friend class OpenGL::Renderer;
+		friend class Direct3D9::Renderer;
 	};
 
 }

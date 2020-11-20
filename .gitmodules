@@ -1,12 +1,12 @@
 [submodule "vendor/SDL2"]
 	path = vendor/SDL2
 	url = https://github.com/Shadax-stack/SDL-mirror-submodule
-[submodule "vendor/spdlog"]
-	path = vendor/spdlog
-	url = https://github.com/gabime/spdlog
 [submodule "vendor/Krypton"]
 	path = vendor/Krypton
 	url = https://github.com/Shadax-stack/Krypton
 [submodule "vendor/GLEW"]
 	path = vendor/GLEW
 	url = https://github.com/Perlmint/glew-cmake
+[submodule "vendor/portable-snippets"]
+	path = vendor/portable-snippets
+	url = https://github.com/nemequ/portable-snippets

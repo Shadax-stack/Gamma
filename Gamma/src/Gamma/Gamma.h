@@ -27,9 +27,34 @@
 
 namespace Gamma {
 
+	namespace OpenGL {
+
+		enum class Version {
+			OGL_1_1,
+			OGL_1_2,
+			OGL_1_3,
+			OGL_1_4,
+			OGL_1_5,
+			OGL_2_0,
+			OGL_2_1,
+			OGL_3_0,
+			OGL_3_1,
+			OGL_3_2,
+			OGL_3_3,
+			OGL_4_0,
+		};
+
+	}
+
 	GAMMA_API void GammaInit(void);
 	GAMMA_API void GammaQuit(void);
 
+	//So the IDE can help us better
+	namespace Graphics = OpenGL;
+
 }
+
+//A preprocesser define is used to avoid weird errors with namespaces and friend classes
+#define Graphics OpenGL
 
 #endif
