@@ -81,6 +81,7 @@ if(GAMMA_BUILD_OPENGL)
 	endif(WIN32)
 	target_link_libraries(Gamma PRIVATE libglew_static)
 	target_compile_definitions(Gamma PUBLIC "-DGLEW_STATIC=1")
+	target_compile_definitions(Gamma PUBLIC "-DGLEW_BUILD=1")
 elseif(GAMMA_BUILD_VULKAN)
 	#Do nothing, for now
 elseif(GAMMA_BUILD_D3D9)

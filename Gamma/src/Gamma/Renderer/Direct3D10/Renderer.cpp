@@ -11,7 +11,7 @@ namespace Gamma {
 
 		void Gamma_Graphics_API_Init(void) {
 			// It appears that D3D10 requires no initailization
-			GAMMA_INFO("Initialized D3D10");
+			//GAMMA_INFO("Initialized D3D10");
 		}
 
 		void Gamma_Graphics_API_Quit(void) {
@@ -68,7 +68,7 @@ namespace Gamma {
 			GAMMA_INFO("Created D3D10 device and DXGI swap chain with size of %i by %i", ContextSwapChain.Description.BufferDesc.Width, ContextSwapChain.Description.BufferDesc.Height);
 			// Set up the backbuffer
 			Result = ContextSwapChain.SwapChain->GetBuffer(0, __uuidof(ID3D10Texture2D), (void**)&ContextSwapChain.BackBuffer.Texture2D);
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "Unable to get back buffer 0, IDXGISwapChain::GetBuffer returned %i", Result);
+			GAMMA_ASSERT_CRITICAL(Result == S_OK && ContextSwapChain.BackBuffer.Texture2D != NULL, "Unable to get back buffer 0, IDXGISwapChain::GetBuffer returned %i", Result);
 			GAMMA_INFO("Created back buffer");
 			// Create the render target view
 			Result = Device->CreateRenderTargetView(ContextSwapChain.BackBuffer.Texture2D, NULL, &ContextSwapChain.BackBuffer.RenderTargetView);

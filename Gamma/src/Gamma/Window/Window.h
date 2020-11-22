@@ -64,7 +64,8 @@ namespace Gamma {
 		Rectangle GetDimensions(void);
 	private:
 		WindowClass WndClass;
-		SDL_Window* pWindow;
+		SDL_Window* InternalWindow;
+		uint32_t WindowID;
 		std::vector<WindowEvent> EventQueue;
 		Rectangle Dimensions;
 		friend class Graphics::Renderer;

@@ -20,17 +20,18 @@ namespace Gamma {
 
 	void Window::OpenWindow(WindowClass wndclass, const char* title, int32_t width, int32_t height, int32_t xpos, int32_t ypos) {
 		WndClass = wndclass;
-		pWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WINDOW_GRAPHICS_API_FLAG);
-		GAMMA_ASSERT(pWindow, "Fatal error in creating window: %s", SDL_GetError());
-		GAMMA_INFO("Created window %i of size %i by %i", SDL_GetWindowID(pWindow), width, height);
+		InternalWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WINDOW_GRAPHICS_API_FLAG);
+		GAMMA_ASSERT(InternalWindow, "Fatal error in creating window: %s", SDL_GetError());
+		WindowID = SDL_GetWindowID(InternalWindow);
+		GAMMA_INFO("Created window %i of size %i by %i", WindowID, width, height);
 		
 		Dimensions.Width = (int)width;
 		Dimensions.Height = (int)height;
 	}
 
 	void Window::CloseWindow(void) {
-		GAMMA_INFO("Destroying window %i", SDL_GetWindowID(pWindow));
-		SDL_DestroyWindow(pWindow);
+		GAMMA_INFO("Destroying window %i", WindowID);
+		SDL_DestroyWindow(InternalWindow);
 	}
 
 	WindowState Window::GetState(void) {
@@ -42,7 +43,7 @@ namespace Gamma {
 		std::vector<SDL_Event> IrrelevantEvents;
 		IrrelevantEvents.reserve(2048);
 		while (SDL_PollEvent(&Event)) {
-			if (Event.window.windowID == SDL_GetWindowID(pWindow)) {
+			if (Event.window.windowID == WindowID) {
 				switch (Event.window.event) {
 					case SDL_WINDOWEVENT_CLOSE: {
 						WndClass.WindowState = WindowState::CLOSED;
@@ -69,7 +70,7 @@ namespace Gamma {
 	}
 
 	SDL_Window* Window::GetInternalWindow(void) {
-		return pWindow;
+		return InternalWindow;
 	}
 
 	Rectangle Window::GetDimensions(void) {

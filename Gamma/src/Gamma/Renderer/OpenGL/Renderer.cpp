@@ -6,23 +6,16 @@ namespace Gamma {
 
 	namespace OpenGL {
 
-		void Gamma_OpenGL_Init(void) {
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-			glewExperimental = GL_TRUE;
-		}
-
 		void Renderer::CreateContext(Gamma::Window* window) {
 			Context = SDL_GL_CreateContext(window->GetInternalWindow());
 			GAMMA_ASSERT_CRITICAL(Context, "Error while creating the context: ", SDL_GetError());
+			GAMMA_INFO("Created OpenGL context");
 			SDL_GL_MakeCurrent(window->GetInternalWindow(), Context);
 			Window = window;
 			SDL_GL_SetSwapInterval(1);
 			uint32_t glewInitResult = glewInit();
 			GAMMA_ASSERT_CRITICAL(glewInitResult == GLEW_OK, "Unable to initailize GLEW");
+			GAMMA_INFO("Initailized GLEW");
 		}
 
 		void Renderer::FreeContext(void) {
@@ -45,6 +38,20 @@ namespace Gamma {
 
 		void Renderer::EndFrame(void) {
 			SwapBuffers();
+		}
+
+		void Gamma_Graphics_API_Init(void) {
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+			SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+			glewExperimental = GL_TRUE;
+			GAMMA_INFO("OpenGL ready for initialization");
+		}
+
+		void Gamma_Graphics_API_Quit(void) {
+			GAMMA_INFO("Terminated OpenGL");
 		}
 
 	}
