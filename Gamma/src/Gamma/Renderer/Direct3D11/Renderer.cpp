@@ -133,18 +133,20 @@ namespace Gamma {
 		}
 
 		void Renderer::SwapBuffers(void) {
-
+			SwapChain.SwapChain->Present(1, 0);
 		}
 
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
-
+			DeviceContext->ClearRenderTargetView(SwapChain.BackBuffer.RenderTargetView, (const float*)&color);
+			DeviceContext->ClearDepthStencilView(SwapChain.DepthStencilBuffer.DepthStencilView, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, depth, stencil);
 		}
 
 		void Renderer::NewFrame(void) {
-
+			Clear(Krypton::Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 255);
 		}
 
 		void Renderer::EndFrame(void) {
+			SwapBuffers();
 
 		}
 
