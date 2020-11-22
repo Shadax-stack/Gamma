@@ -35,12 +35,16 @@ file(GLOB Gamma_SRC
 	"src/Gamma/Renderer/*.cpp"
 ) 
 
+if(WIN32)
+	file(GLOB_RECURSE Gamma_Platform_SRC "src/Gamma/Win32/**.h" "src/Gamma/Win32/**.cpp")
+endif(WIN32)
+
 option(GAMMA_SHARED_LIBRARY "Build Gamma as a shared library" OFF)
 if(GAMMA_SHARED_LIBRARY)
-	add_library(Gamma SHARED ${Gamma_SRC} ${Gamma_Renderer_SRC})
+	add_library(Gamma SHARED ${Gamma_SRC} ${Gamma_Renderer_SRC} ${Gamma_Platform_SRC})
 	target_compile_definitions(Gamma PUBLIC GAMMA_SHARED_LIBRARY)
 else(GAMMA_SHARED_LIBRARY)
-	add_library(Gamma STATIC ${Gamma_SRC} ${Gamma_Renderer_SRC})
+	add_library(Gamma STATIC ${Gamma_SRC} ${Gamma_Renderer_SRC} ${Gamma_Platform_SRC})
 endif(GAMMA_SHARED_LIBRARY)
 
 
@@ -85,12 +89,11 @@ elseif(GAMMA_BUILD_D3D9)
 	target_link_libraries(Gamma PRIVATE "dxgi" "d3dcompiler")
 	target_compile_definitions(Gamma PUBLIC GAMMA_GRAPHICS_API_DIRECT_X GAMMA_GRAPHICS_API_DIRECT_X_9)
 elseif(GAMMA_BUILD_D3D10)
-	target_compile_definitions(Gamma PUBLIC "-DGAMMA_BUILD_D310")
-	target_link_libraries(Gamma PRIVATE "d3d10")
+	target_compile_definitions(Gamma PUBLIC "-DGAMMA_BUILD_D3D10")
+	target_link_libraries(Gamma PRIVATE "D3D10")
 	target_link_libraries(Gamma PRIVATE "dxgi" "d3dcompiler")
 	target_compile_definitions(Gamma PUBLIC GAMMA_GRAPHICS_API_DIRECT_X GAMMA_GRAPHICS_API_DIRECT_X_10)
 elseif(GAMMA_BUILD_D3D11)
-	CreateGamma(${Gamma_SRC})
 	target_compile_definitions(Gamma PUBLIC "-DGAMMA_BUILD_D3D11")
 	target_link_libraries(Gamma PRIVATE "d3d11")
 	target_link_libraries(Gamma PRIVATE "dxgi" "d3dcompiler")

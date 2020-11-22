@@ -16,9 +16,9 @@ namespace Gamma {
 		}
 
 		void Renderer::CreateContext(Gamma::Window* window) {
-			Context = SDL_GL_CreateContext(window->pWindow);
+			Context = SDL_GL_CreateContext(window->GetInternalWindow());
 			GAMMA_ASSERT_CRITICAL(Context, "Error while creating the context: ", SDL_GetError());
-			SDL_GL_MakeCurrent(window->pWindow, Context);
+			SDL_GL_MakeCurrent(window->GetInternalWindow(), Context);
 			Window = window;
 			SDL_GL_SetSwapInterval(1);
 			uint32_t glewInitResult = glewInit();
@@ -30,7 +30,7 @@ namespace Gamma {
 		}
 
 		void Renderer::SwapBuffers(void) {
-			SDL_GL_SwapWindow(Window->pWindow);
+			SDL_GL_SwapWindow(Window->GetInternalWindow());
 		}
 
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
@@ -40,12 +40,7 @@ namespace Gamma {
 		}
 
 		void Renderer::NewFrame(void) {
-			Krypton::Vector4f defaultColor;
-			defaultColor.r = 0.0f;
-			defaultColor.g = 0.0f;
-			defaultColor.b = 0.0f;
-			defaultColor.a = 0.0f;
-			Clear(defaultColor);
+			Clear(Krypton::Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 255);
 		}
 
 		void Renderer::EndFrame(void) {

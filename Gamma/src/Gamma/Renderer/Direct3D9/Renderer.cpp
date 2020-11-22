@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include <SDL_syswm.h>
 #include "../../Core/Log.h"
+#include "../../Win32/Direct3DUtils.h"
 #ifdef GAMMA_PLATFORM_WINDOWS
 #include <Windows.h>
 #define THREAD_SLEEP(milliseconds) Sleep(milliseconds)
@@ -16,71 +17,15 @@ namespace Gamma {
 	namespace Direct3D9 {
 
 		LPDIRECT3D9 Direct3D9Interface;
-
-		void Gamma_Direct3D9_Init(void) {
-			Direct3D9Interface = Direct3DCreate9(D3D_SDK_VERSION);
-		}
-
-		void Gamma_Direct3D9_Quit(void) {
-			Direct3D9Interface->Release();
-		}
-
-		HRESULT CheckFormat(D3DFORMAT fmt, bool windowed) {
-			return Direct3D9Interface->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, fmt, fmt, windowed);
-		}
-
-		D3DFORMAT FindUsableFormat(bool windowed) {
-			D3DDISPLAYMODE DisplayMode;
-			HRESULT Result;
-			Result = Direct3D9Interface->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &DisplayMode);
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to get the D3DDISPLAYMODE: IDirect3D9::GetAdapterDisplayMode returned %i", Result);
-			Result = CheckFormat(DisplayMode.Format, windowed);
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to find a usable D3DFMT: IDirect3D9::CheckDeviceType returned %i", Result);
-			GAMMA_INFO("Found usable D3DFMT: %i", DisplayMode.Format);
-			return DisplayMode.Format;
-		}
-
-		HWND GetWindowHandle(SDL_Window* window) {
-			SDL_SysWMinfo wmInfo;
-			SDL_VERSION(&wmInfo.version);
-			SDL_GetWindowWMInfo(window, &wmInfo);
-			return wmInfo.info.win.window;
-		}
-
-#define GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS 16
-
-		void Renderer::RecoverDevice(LPDIRECT3DDEVICE9 device) {
-			HRESULT Result;
-			uint16_t RecoveryAttempts = 0;
-		DeviceRecovery:
-			Result = device->TestCooperativeLevel();
-			if (Result == D3DERR_DEVICELOST) {
-				GAMMA_INFO("IDirect3DDevice9 recovery attempt %i", RecoveryAttempts++);
-				while (Result == D3DERR_DEVICELOST) {
-					THREAD_SLEEP(1);
-					Result = device->TestCooperativeLevel();
-				}
-				Result = device->Reset(&DevicePresentParameters);
-				GAMMA_ASSERT_ERROR(SUCCEEDED(Result), "Failed to reset IDirect3DDevice9: IDirect3DDevice9::Reset returned %i", Result);
-				if (FAILED(Result)) {
-					if (RecoveryAttempts < GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS) {
-						GAMMA_INFO("Attempting to rerecover IDirect3DDevice9 with %i tries remaining", GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS - RecoveryAttempts);
-						goto DeviceRecovery;
-					}
-					else {
-						GAMMA_CRITICAL("Failed to recover IDirect3DDevice9");
-						psnip_trap();
-					}
-				}
-			}
-		}
+		HRESULT CheckFormat(D3DFORMAT fmt, bool windowed);
+		D3DFORMAT FindUsableFormat(bool windowed);
 
 		void Renderer::CreateContext(Gamma::Window* window) {
 			// A D3D9 device needs to be initialized using a D3DPRESENT_PARAMETERS structure
 			// We fill out the values and then initalize the device with it
 			HRESULT Result;
 			// Get the WIN32 API window handle from our SDL2 window
-			HWND hWindow = GetWindowHandle(window->pWindow);
+			HWND hWindow = Win32::GetWindowHandle(window->GetInternalWindow());
 			// We actually don't need to set the struct to 0 since all the mmebers will be defined
 			// However we will still for debug builds as good programming practice
 			#ifdef GAMMA_DEBUG
@@ -91,8 +36,8 @@ namespace Gamma {
 			// Until I can get SDL2 to work fullscreen our renderer will assum that the window is windowed
 			DevicePresentParameters.Windowed = TRUE;
 			// Set the back buffer dimensions to the window dimensions
-			DevicePresentParameters.BackBufferWidth = window->Width;
-			DevicePresentParameters.BackBufferHeight = window->Height;
+			DevicePresentParameters.BackBufferWidth = window->GetDimensions().Width;
+			DevicePresentParameters.BackBufferHeight = window->GetDimensions().Height;
 			// We only want a single back buffer
 			DevicePresentParameters.BackBufferCount = 0; // 0 is the same as 1 in this case
 			// Use D3DSWAPEFFECT_DISCARD for fast buffer swapping
@@ -147,12 +92,7 @@ namespace Gamma {
 		void Renderer::NewFrame(void) {
 			RecoverDevice(Device);
 			HRESULT Result;
-			Krypton::Vector4f color;
-			color.r = 0.0f;
-			color.g = 0.0f;
-			color.b = 0.0f;
-			color.a = 0.0f;
-			Clear(color);
+			Clear(Krypton::Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 255);
 			Result = Device->BeginScene();
 			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to begin the scene: IDirect3DDevice9::BeginScene returned %i", Result);
 		}
@@ -163,6 +103,58 @@ namespace Gamma {
 			Result = Device->EndScene();
 			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to end the scene: IDirect3DDevice9::EndScene returned %i", Result);
 			SwapBuffers();
+		}
+
+		#define GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS 5
+		void Renderer::RecoverDevice(LPDIRECT3DDEVICE9 device) {
+			HRESULT Result;
+			uint16_t RecoveryAttempts = 0;
+		DeviceRecovery:
+			Result = device->TestCooperativeLevel();
+			if (Result == D3DERR_DEVICELOST) {
+				GAMMA_INFO("IDirect3DDevice9 recovery attempt %i", RecoveryAttempts++);
+				while (Result == D3DERR_DEVICELOST) {
+					THREAD_SLEEP(1);
+					Result = device->TestCooperativeLevel();
+				}
+				Result = device->Reset(&DevicePresentParameters);
+				GAMMA_ASSERT_ERROR(SUCCEEDED(Result), "Failed to reset IDirect3DDevice9: IDirect3DDevice9::Reset returned %i", Result);
+				if (FAILED(Result)) {
+					if (RecoveryAttempts < GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS) {
+						GAMMA_INFO("Attempting to rerecover IDirect3DDevice9 with %i tries remaining", GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS - RecoveryAttempts);
+						goto DeviceRecovery;
+					}
+					else {
+						GAMMA_CRITICAL("Failed to recover IDirect3DDevice9");
+						psnip_trap();
+					}
+				}
+			}
+		}
+
+		HRESULT CheckFormat(D3DFORMAT fmt, bool windowed) {
+			return Direct3D9Interface->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, fmt, fmt, windowed);
+		}
+
+		D3DFORMAT FindUsableFormat(bool windowed) {
+			D3DDISPLAYMODE DisplayMode;
+			HRESULT Result;
+			Result = Direct3D9Interface->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &DisplayMode);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to get the D3DDISPLAYMODE: IDirect3D9::GetAdapterDisplayMode returned %i", Result);
+			Result = CheckFormat(DisplayMode.Format, windowed);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to find a usable D3DFMT: IDirect3D9::CheckDeviceType returned %i", Result);
+			GAMMA_INFO("Found usable D3DFMT: %i", DisplayMode.Format);
+			return DisplayMode.Format;
+		}
+
+		void Gamma_Graphics_API_Init(void) {
+			Direct3D9Interface = Direct3DCreate9(D3D_SDK_VERSION);
+			GAMMA_INFO("Initialized a Direct3D 9 interface");
+		}
+
+		void Gamma_Graphics_API_Quit(void) {
+			Direct3D9Interface->Release();
+			GAMMA_INFO("Released the Direct3D 9 interface");
 		}
 
 	}

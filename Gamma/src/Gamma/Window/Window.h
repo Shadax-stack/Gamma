@@ -7,17 +7,21 @@
 #include <SDL.h>
 #include <stdint.h>
 #include <vector>
+#include <Krypton/Vector.h>
 
 namespace Gamma {
 
 	//Pre-declare any freind classes we may be using
-	namespace OpenGL {
+	namespace Graphics {
 		class Renderer;
 	}
 
-	namespace Direct3D9 {
-		class Renderer;
-	}
+	// A rectangle struct, TODO: move this to Krypton
+
+	struct Rectangle {
+		int Width;
+		int Height;
+	};
 
 	enum class FullscreenState {
 		WINDOWED = 0,
@@ -55,13 +59,15 @@ namespace Gamma {
 		void PollEvents(void);
 		WindowState GetState(void);
 		bool ShouldClose(void);
+		bool GetFullscreenState(void);
+		SDL_Window* GetInternalWindow(void);
+		Rectangle GetDimensions(void);
 	private:
 		WindowClass WndClass;
 		SDL_Window* pWindow;
 		std::vector<WindowEvent> EventQueue;
-		int Width, Height;
-		friend class OpenGL::Renderer;
-		friend class Direct3D9::Renderer;
+		Rectangle Dimensions;
+		friend class Graphics::Renderer;
 	};
 
 }

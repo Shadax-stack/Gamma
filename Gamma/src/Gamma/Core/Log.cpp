@@ -19,7 +19,7 @@ namespace Gamma {
 		int time_get = _timespec64_get(&time, TIME_UTC); 
 		uint64_t seconds = time.tv_sec + TimeOffset;
 		CurrentTime[0] = '\0'; // Overwrite the previous time
-		sprintf(CurrentTime, "%lli:%lli:%lli", seconds / 3600 % 24, seconds / 60 % 60, seconds % 60);
+		sprintf_s(CurrentTime, sizeof(CurrentTime), "%lli:%lli:%lli", seconds / 3600 % 24, seconds / 60 % 60, seconds % 60);
 		return CurrentTime;
 	}
 

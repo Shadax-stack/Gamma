@@ -23,8 +23,9 @@ namespace Gamma {
 		pWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WINDOW_GRAPHICS_API_FLAG);
 		GAMMA_ASSERT(pWindow, "Fatal error in creating window: %s", SDL_GetError());
 		GAMMA_INFO("Created window %i of size %i by %i", SDL_GetWindowID(pWindow), width, height);
-		Width = (int)width;
-		Height = (int)height;
+		
+		Dimensions.Width = (int)width;
+		Dimensions.Height = (int)height;
 	}
 
 	void Window::CloseWindow(void) {
@@ -61,6 +62,18 @@ namespace Gamma {
 
 	bool Window::ShouldClose(void) {
 		return GetState() == WindowState::CLOSED;
+	}
+
+	bool Window::GetFullscreenState(void) {
+		return (WndClass.FullscreenState == FullscreenState::FULLSCREEN) || (WndClass.FullscreenState == FullscreenState::FULLSCREEN_WINDOWED);
+	}
+
+	SDL_Window* Window::GetInternalWindow(void) {
+		return pWindow;
+	}
+
+	Rectangle Window::GetDimensions(void) {
+		return Dimensions;
 	}
 
 }

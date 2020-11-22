@@ -12,33 +12,12 @@ namespace Gamma {
 	extern uint64_t TimeOffset;
 #endif
 
-#ifdef GAMMA_BUILD_D3D9
-	namespace Direct3D9 {
-		extern void Gamma_Direct3D9_Init(void);
-		extern void Gamma_Direct3D9_Quit(void);
+	namespace Graphics {
+		extern GAMMA_API void Gamma_Graphics_API_Init(void);
+		extern GAMMA_API void Gamma_Graphics_API_Quit(void);
 	}
-#endif
-
-#ifdef GAMMA_BUILD_D3D11
-	namespace Direct3D11 {
-		extern void Gamma_Direct3D11_Init(void);
-	}
-#endif
-
-#ifdef GAMMA_BUILD_OPENGL
-	namespace OpenGL {
-		extern void Gamma_OpenGL_Init(void);
-	}
-#endif
 
 	void GammaInit(void) {
-#ifdef GAMMA_BUILD_OPENGL
-		OpenGL::Gamma_OpenGL_Init();
-#endif
-#ifdef GAMMA_BUILD_D3D9
-		Direct3D9::Gamma_Direct3D9_Init();
-#endif
-		SDL_Init(SDL_INIT_VIDEO);
 #ifdef GAMMA_DEBUG
 		time_t local, gmt, now = time(nullptr);
 		tm TimeInfo;
@@ -48,12 +27,12 @@ namespace Gamma {
 		gmt = mktime(&TimeInfo);
 		TimeOffset = local - gmt;
 #endif
+		Graphics::Gamma_Graphics_API_Init();
+		SDL_Init(SDL_INIT_VIDEO);
 	}
 
 	void GammaQuit(void) {
-#ifdef GAMMA_BUILD_D3D9
-		Direct3D9::Gamma_Direct3D9_Quit();
-#endif
+		Graphics::Gamma_Graphics_API_Quit();
 		SDL_Quit();
 	}
 
