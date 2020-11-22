@@ -36,7 +36,7 @@ namespace Gamma {
 				} DepthStencilBuffer;
 				D3D10_VIEWPORT Viewport;
 				Rectangle Dimensions;
-			} ContextSwapChain;
+			} SwapChain;
 		};
 
 		
