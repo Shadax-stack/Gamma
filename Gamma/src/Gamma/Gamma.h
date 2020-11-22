@@ -65,9 +65,13 @@ namespace Gamma {
 
 	}
 
+	namespace Direct3D11 {
 
+		enum class Version {
+			//TODO: Add versions for this API
+		};
 
-
+	}
 
 	GAMMA_API void GammaInit(void);
 	GAMMA_API void GammaQuit(void);

@@ -65,7 +65,7 @@ namespace Gamma {
 				&Device                               // Create the device into the device class member
 			);
 			// Make sure our device is valid on debug builds
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to create a D3D9 device: IDirect3D9::CreateDevice returned %i", Result);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to create a D3D9 device: IDirect3D9::CreateDevice returned %#010x", Result);
 			GAMMA_INFO("Sucessfuly created a IDirect3DDevice9");
 		}
 
@@ -78,7 +78,7 @@ namespace Gamma {
 			RecoverDevice(Device);
 			HRESULT Result;
 			Result = Device->Present(NULL, NULL, NULL, NULL);
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to present the backbuffer, IDirect3DDevice9::Present returned %i", Result);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to present the backbuffer, IDirect3DDevice9::Present returned %#010x", Result);
 		}
 
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
@@ -86,7 +86,7 @@ namespace Gamma {
 			HRESULT Result;
 			D3DCOLOR ClearColor = D3DCOLOR_RGBA((uint8_t)(color.r * 255), (uint8_t)(color.g * 255), (uint8_t)(color.b * 255), (uint8_t)(color.a * 255));
 			Result = Device->Clear(0, NULL, D3DCLEAR_TARGET, ClearColor, 1.0f, 255);
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to clear the backbuffer: IDirect3DDevice9::Clear returned %i", Result);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to clear the backbuffer: IDirect3DDevice9::Clear returned %#010x", Result);
 		}
 
 		void Renderer::NewFrame(void) {
@@ -94,14 +94,14 @@ namespace Gamma {
 			HRESULT Result;
 			Clear(Krypton::Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 255);
 			Result = Device->BeginScene();
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to begin the scene: IDirect3DDevice9::BeginScene returned %i", Result);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to begin the scene: IDirect3DDevice9::BeginScene returned %#010x", Result);
 		}
 
 		void Renderer::EndFrame(void) {
 			RecoverDevice(Device);
 			HRESULT Result;
 			Result = Device->EndScene();
-			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to end the scene: IDirect3DDevice9::EndScene returned %i", Result);
+			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to end the scene: IDirect3DDevice9::EndScene returned %#010x", Result);
 			SwapBuffers();
 		}
 
@@ -118,7 +118,7 @@ namespace Gamma {
 					Result = device->TestCooperativeLevel();
 				}
 				Result = device->Reset(&DevicePresentParameters);
-				GAMMA_ASSERT_ERROR(SUCCEEDED(Result), "Failed to reset IDirect3DDevice9: IDirect3DDevice9::Reset returned %i", Result);
+				GAMMA_ASSERT_ERROR(SUCCEEDED(Result), "Failed to reset IDirect3DDevice9: IDirect3DDevice9::Reset returned %#010x", Result);
 				if (FAILED(Result)) {
 					if (RecoveryAttempts < GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS) {
 						GAMMA_INFO("Attempting to rerecover IDirect3DDevice9 with %i tries remaining", GAMMA_D3D9_DEVICE_MAX_RECOVERY_ATTEMPTS - RecoveryAttempts);

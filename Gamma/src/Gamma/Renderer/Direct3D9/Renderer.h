@@ -1,5 +1,5 @@
-#ifndef GAMMA_DIRECT3D9_RENDERER_H
-#define GAMMA_DIRECT3D9_RENDERER_H
+#ifndef GAMMA_D3D9_RENDERER_H
+#define GAMMA_D3D9_RENDERER_H
 
 #include "../../Gamma.h"
 #include "../../Window/Window.h"

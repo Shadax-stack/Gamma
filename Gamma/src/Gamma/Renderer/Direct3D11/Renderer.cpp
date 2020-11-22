@@ -53,7 +53,7 @@ namespace Gamma {
 			SwapChain.Description.BufferDesc.RefreshRate.Denominator = 1;
 			// Unspecified rasterizing
 			SwapChain.Description.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			// For now it will be centered unless we want to use streched for something like 4:3 on to 16:9, which would be useful in shooter games
+			// For now it will be centered unless we want to use streched for something like 4:3 on to 16:9
 			SwapChain.Description.BufferDesc.Scaling = DXGI_MODE_SCALING_CENTERED;
 			// Disable multisampling
 			SwapChain.Description.SampleDesc.Count = 1;
@@ -137,7 +137,8 @@ namespace Gamma {
 		}
 
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
-			DeviceContext->ClearRenderTargetView(SwapChain.BackBuffer.RenderTargetView, (const float*)&color);
+			float ReversedColor[4]{ color.a, color.b, color.g, color.r }; // Although the microsoft docs say it is a RGBA value, it appears that it's actually a ABGR value
+			DeviceContext->ClearRenderTargetView(SwapChain.BackBuffer.RenderTargetView, ReversedColor);
 			DeviceContext->ClearDepthStencilView(SwapChain.DepthStencilBuffer.DepthStencilView, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, depth, stencil);
 		}
 
@@ -147,7 +148,6 @@ namespace Gamma {
 
 		void Renderer::EndFrame(void) {
 			SwapBuffers();
-
 		}
 
 		void Gamma_Graphics_API_Init(void) {
