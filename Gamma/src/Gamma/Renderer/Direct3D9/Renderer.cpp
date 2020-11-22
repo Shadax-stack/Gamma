@@ -84,7 +84,15 @@ namespace Gamma {
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
 			RecoverDevice(Device);
 			HRESULT Result;
-			D3DCOLOR ClearColor = D3DCOLOR_RGBA((uint8_t)(color.r * 255), (uint8_t)(color.g * 255), (uint8_t)(color.b * 255), (uint8_t)(color.a * 255));
+			struct  ReversedColor {
+				uint8_t r, g, b, a;
+				ReversedColor(const Krypton::Vector4f& color) : 
+					r((uint8_t)(color.a * 255)),
+					g((uint8_t)(color.b * 255)),
+					b((uint8_t)(color.g * 255)),
+					a((uint8_t)(color.r * 255)) {}
+			} ReversedColor(color);
+			D3DCOLOR ClearColor = D3DCOLOR_RGBA(ReversedColor.r, ReversedColor.g, ReversedColor.b, ReversedColor.a);
 			Result = Device->Clear(0, NULL, D3DCLEAR_TARGET, ClearColor, 1.0f, 255);
 			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to clear the backbuffer: IDirect3DDevice9::Clear returned %#010x", Result);
 		}
@@ -92,7 +100,7 @@ namespace Gamma {
 		void Renderer::NewFrame(void) {
 			RecoverDevice(Device);
 			HRESULT Result;
-			Clear(Krypton::Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 255);
+			Clear(Krypton::Vector4f(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 255);
 			Result = Device->BeginScene();
 			GAMMA_ASSERT_CRITICAL(Result == D3D_OK, "Unable to begin the scene: IDirect3DDevice9::BeginScene returned %#010x", Result);
 		}

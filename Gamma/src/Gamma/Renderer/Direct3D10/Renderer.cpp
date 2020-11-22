@@ -124,7 +124,8 @@ namespace Gamma {
 		}
 
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) { 
-			Device->ClearRenderTargetView(SwapChain.BackBuffer.RenderTargetView, (const float*)&color);
+			float ReversedColor[4]{ color.a, color.b, color.g, color.r };
+			Device->ClearRenderTargetView(SwapChain.BackBuffer.RenderTargetView, ReversedColor);
 			Device->ClearDepthStencilView(SwapChain.DepthStencilBuffer.DepthStencilView, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, depth, stencil);
 		}
 

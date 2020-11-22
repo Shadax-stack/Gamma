@@ -137,7 +137,7 @@ namespace Gamma {
 		}
 
 		void Renderer::Clear(const Krypton::Vector4f color, float depth, uint8_t stencil) {
-			float ReversedColor[4]{ color.a, color.b, color.g, color.r }; // Although the microsoft docs say it is a RGBA value, it appears that it's actually a ABGR value
+			float ReversedColor[4]{ color.a, color.b, color.g, color.r };
 			DeviceContext->ClearRenderTargetView(SwapChain.BackBuffer.RenderTargetView, ReversedColor);
 			DeviceContext->ClearDepthStencilView(SwapChain.DepthStencilBuffer.DepthStencilView, D3D10_CLEAR_DEPTH | D3D10_CLEAR_STENCIL, depth, stencil);
 		}
