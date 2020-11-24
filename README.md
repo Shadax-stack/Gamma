@@ -10,11 +10,12 @@ Then open CMake, and use the directory you just cloned as the binary and source 
 - Direct3D 11
 ## TODO list
 - Add basic vertex/index buffers to OpenGL and D3D9
-- Add Direct3D 12 support
-- Add vulkan support
+- Add Direct3D 12 and Vulkan support
 - Add basic vertex/index buffers to D3D10, D3D11, D3D12, and Vulkan
 - Add 2D textures
+- A system to recycle objects and move to Google tcmalloc for faster object creation
 - Add transforms and camera
 - Add a lighting system
 - Transition to PBR
+- Create a better object creation system
 - Create a scene system
