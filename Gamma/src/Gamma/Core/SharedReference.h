@@ -8,10 +8,10 @@
 namespace Gamma {
 
 	// Base on IUnknown
-	class GAMMA_API GammaUnknown16 {
+	class GAMMA_API Reference16 {
 	public:
-		GammaUnknown16(void);
-		virtual ~GammaUnknown16(void) = default;
+		Reference16(void);
+		virtual ~Reference16(void) = default;
 		void AddRef(void);
 		void Release(void);
 		uint16_t GetRefCount(void);
@@ -19,10 +19,10 @@ namespace Gamma {
 		uint16_t ReferenceCount;
 	};
 
-	class GAMMA_API GammaUnknown16MT { 
+	class GAMMA_API Reference16MT {
 	public:
-		GammaUnknown16MT(void);
-		virtual ~GammaUnknown16MT(void) = default;
+		Reference16MT(void);
+		virtual ~Reference16MT(void) = default;
 		void AddRef(void);
 		void Release(void);
 		uint16_t GetRefCount(void);
@@ -30,10 +30,10 @@ namespace Gamma {
 		std::atomic<uint16_t> ReferenceCount;
 	};
 
-	class GAMMA_API GammaUnknown32 {
+	class GAMMA_API Reference32 {
 	public:
-		GammaUnknown32(void);
-		virtual ~GammaUnknown32(void) = default;
+		Reference32(void);
+		virtual ~Reference32(void) = default;
 		void AddRef(void);
 		void Release(void);
 		uint32_t GetRefCount(void);
@@ -41,10 +41,10 @@ namespace Gamma {
 		uint32_t ReferenceCount;
 	};
 
-	class GAMMA_API GammaUnknown32MT {
+	class GAMMA_API Reference32MT {
 	public:
-		GammaUnknown32MT(void);
-		virtual ~GammaUnknown32MT(void) = default;
+		Reference32MT(void);
+		virtual ~Reference32MT(void) = default;
 		void AddRef(void);
 		void Release(void);
 		uint32_t GetRefCount(void);
@@ -52,7 +52,7 @@ namespace Gamma {
 		std::atomic<uint32_t> ReferenceCount;
 	};
 
-	typedef GammaUnknown16 GammaUnknown;
+	typedef Reference16 Reference;
 
 }
 

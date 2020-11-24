@@ -2,67 +2,67 @@
 
 namespace Gamma {
 
-	GammaUnknown16::GammaUnknown16(void) : ReferenceCount(1) {}
+	Reference16::Reference16(void) : ReferenceCount(1) {}
 
-	void GammaUnknown16::AddRef(void) {
+	void Reference16::AddRef(void) {
 		ReferenceCount++;
 	}
 
-	void GammaUnknown16::Release(void) {
+	void Reference16::Release(void) {
 		if (--ReferenceCount == 0) {
 			delete this;
 		}
 	}
 
-	uint16_t GammaUnknown16::GetRefCount(void) {
+	uint16_t Reference16::GetRefCount(void) {
 		return ReferenceCount;
 	}
 
-	GammaUnknown16MT::GammaUnknown16MT(void) : ReferenceCount(1) {}
+	Reference16MT::Reference16MT(void) : ReferenceCount(1) {}
 
-	void GammaUnknown16MT::AddRef(void) {
+	void Reference16MT::AddRef(void) {
 		ReferenceCount++;
 	}
 
-	void GammaUnknown16MT::Release(void) {
+	void Reference16MT::Release(void) {
 		if (--ReferenceCount == 0) {
 			delete this;
 		}
 	}
 
-	uint16_t GammaUnknown16MT::GetRefCount(void) {
+	uint16_t Reference16MT::GetRefCount(void) {
 		return ReferenceCount;
 	}
 
-	GammaUnknown32::GammaUnknown32(void) : ReferenceCount(1) {}
+	Reference32::Reference32(void) : ReferenceCount(1) {}
 
-	void GammaUnknown32::AddRef(void) {
+	void Reference32::AddRef(void) {
 		ReferenceCount++;
 	}
 
-	void GammaUnknown32::Release(void) {
+	void Reference32::Release(void) {
 		if (--ReferenceCount == 0) {
 			delete this;
 		}
 	}
 
-	uint32_t GammaUnknown32::GetRefCount(void) {
+	uint32_t Reference32::GetRefCount(void) {
 		return ReferenceCount;
 	}
 
-	GammaUnknown32MT::GammaUnknown32MT(void) : ReferenceCount(1) {}
+	Reference32MT::Reference32MT(void) : ReferenceCount(1) {}
 
-	void GammaUnknown32MT::AddRef(void) {
+	void Reference32MT::AddRef(void) {
 		ReferenceCount++;
 	}
 
-	void GammaUnknown32MT::Release(void) {
+	void Reference32MT::Release(void) {
 		if (--ReferenceCount == 0) {
 			delete this;
 		}
 	}
 
-	uint32_t GammaUnknown32MT::GetRefCount(void) {
+	uint32_t Reference32MT::GetRefCount(void) {
 		return ReferenceCount;
 	}
 

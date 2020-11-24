@@ -3,6 +3,7 @@
 
 #include "../../Gamma.h"
 #include "Handle.h"
+#include <GL/glew.h>
 
 namespace Gamma {
 
@@ -11,8 +12,13 @@ namespace Gamma {
 		class GAMMA_API Buffer : protected Handle {
 		public:
 
+			enum class TargetType {
+				ARRAY = GL_ARRAY_BUFFER, VERTEX = ARRAY,
+				ELEMENT = GL_ELEMENT_ARRAY_BUFFER, INDEX = ELEMENT,
+			};
 		private:
-			uint32_t Target;
+			TargetType Target;
+			friend class Factory;
 		};
 
 	}
