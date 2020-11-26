@@ -13,9 +13,9 @@ using namespace Gamma::Graphics;
 int main() {
 	GammaInit();
 	WindowClass WndClass;
-	WndClass.FullscreenState = FullscreenState::WINDOWED;
+	WndClass.FullscreenState = FullscreenState::FULLSCREEN;
 	Window Window;
-	Window.OpenWindow(WndClass, "Gamma", 640, 480);
+	Window.OpenWindow(WndClass, "Gamma");
 	Context Context;
 	Context.Initialize(&Window);
 	while (!Window.ShouldClose()) {

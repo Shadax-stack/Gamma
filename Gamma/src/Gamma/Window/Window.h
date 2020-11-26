@@ -33,6 +33,7 @@ namespace Gamma {
 		CLOSED = 0,
 		OPEN = SDL_WINDOW_SHOWN,
 		HIDDEN = SDL_WINDOW_HIDDEN,
+		MINIMIZED = SDL_WINDOW_MINIMIZED
 	};
 
 	struct GAMMA_API WindowClass {
@@ -42,7 +43,7 @@ namespace Gamma {
 		//Basic concped is based off the WINAPI window class
 		FullscreenState FullscreenState;
 		WindowState WindowState;
-
+		uint32_t GetFlags(void);
 	};
 
 	struct GAMMA_API WindowEvent {
@@ -54,14 +55,16 @@ namespace Gamma {
 	class GAMMA_API Window {
 	public:
 		~Window(void);
-		void OpenWindow(WindowClass wndclass, const char* title, int32_t width, int32_t height, int32_t xpos = 0, int32_t ypos = 30);
+		void OpenWindow(WindowClass wndclass, const char* title, int32_t width = -1, int32_t height = -1, int32_t xpos = 0, int32_t ypos = 30);
 		void CloseWindow(void);
 		void PollEvents(void);
 		WindowState GetState(void);
 		bool ShouldClose(void);
 		bool GetFullscreenState(void);
+		void SetFullscreenState(FullscreenState fsstate);
 		SDL_Window* GetInternalWindow(void);
 		Rectangle GetDimensions(void);
+		WindowClass GetInternalWindowClass(void);
 	private:
 		WindowClass WndClass;
 		SDL_Window* InternalWindow;

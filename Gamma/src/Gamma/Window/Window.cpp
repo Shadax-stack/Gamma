@@ -6,11 +6,36 @@
 #include <iostream>
 #include <vector>
 
-#define WINDOW_GRAPHICS_API_FLAG SDL_WINDOW_OPENGL
-
 namespace Gamma {
 
 	WindowClass::WindowClass(void) : FullscreenState(FullscreenState::WINDOWED), WindowState(WindowState::OPEN) {}
+
+	uint32_t WindowClass::GetFlags(void) {
+		uint32_t Flags = 0;
+		switch (FullscreenState) {
+		case FullscreenState::FULLSCREEN:
+			Flags |= SDL_WINDOW_FULLSCREEN;
+			break;
+		case FullscreenState::FULLSCREEN_WINDOWED:
+			Flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			break;
+		default:
+			break;
+		}
+		switch (WindowState) {
+		case WindowState::HIDDEN:
+			Flags |= SDL_WINDOW_HIDDEN;
+			break;
+		case WindowState::OPEN:
+			Flags |= SDL_WINDOW_SHOWN;
+			break;
+		case WindowState::MINIMIZED:
+			Flags |= SDL_WINDOW_MINIMIZED;
+		default:
+			break;
+		}
+		return Flags;
+	}
 
 	WindowEvent::WindowEvent(const SDL_Event event) : EventData(event) {}
 
@@ -20,7 +45,18 @@ namespace Gamma {
 
 	void Window::OpenWindow(WindowClass wndclass, const char* title, int32_t width, int32_t height, int32_t xpos, int32_t ypos) {
 		WndClass = wndclass;
-		InternalWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WINDOW_GRAPHICS_API_FLAG);
+		bool wn1 = width == -1, hn1 = height == -1;
+		if (wn1||hn1) {
+			SDL_DisplayMode DisplayMode;
+			SDL_GetCurrentDisplayMode(0 /* Primary Monitor */, &DisplayMode);
+			if (wn1) {
+				width = DisplayMode.w;
+			}
+			if (hn1) {
+				height = DisplayMode.h;
+			}
+		}
+		InternalWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WndClass.GetFlags());
 		GAMMA_ASSERT(InternalWindow, "Fatal error in creating window: %s", SDL_GetError());
 		WindowID = SDL_GetWindowID(InternalWindow);
 		GAMMA_INFO("WINDOW", "Created window %i of size %i by %i", WindowID, width, height);
@@ -75,6 +111,32 @@ namespace Gamma {
 
 	Rectangle Window::GetDimensions(void) {
 		return Dimensions;
+	}
+
+	WindowClass Window::GetInternalWindowClass(void) {
+		return WndClass;
+	}
+
+	void Window::SetFullscreenState(FullscreenState fsstate) {
+		int Result;
+		WndClass.FullscreenState = fsstate;
+		switch (fsstate) {
+		case FullscreenState::WINDOWED:
+			Result = SDL_SetWindowFullscreen(InternalWindow, 0);
+			GAMMA_ASSERT_CRITICAL(Result == 0, "WINDOW", "Unable to set window to windowed mode: %s", SDL_GetError());
+			break;
+		case FullscreenState::FULLSCREEN_WINDOWED:
+			Result = SDL_SetWindowFullscreen(InternalWindow, SDL_WINDOW_FULLSCREEN_DESKTOP);
+			GAMMA_ASSERT_CRITICAL(Result == 0, "WINDOW", "Unable to set window to fullscreen windowed mode: %s", SDL_GetError());
+			break;
+		case FullscreenState::FULLSCREEN:
+			Result = SDL_SetWindowFullscreen(InternalWindow, SDL_WINDOW_FULLSCREEN);
+			GAMMA_ASSERT_CRITICAL(Result == 0, "WINDOW", "Unable to set window to fullscreen mode: %s", SDL_GetError());
+			break;
+		default:
+			break;
+		}
+		SDL_GetWindowSize(InternalWindow, &Dimensions.Width, &Dimensions.Height);
 	}
 
 }

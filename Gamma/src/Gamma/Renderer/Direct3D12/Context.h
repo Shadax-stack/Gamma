@@ -46,6 +46,7 @@ namespace Gamma {
 			Microsoft::WRL::ComPtr<ID3D12Resource> SwapChainBuffers[GAMMA_D3D12_SWAP_CHAIN_BUFFER_COUNT];
 			Microsoft::WRL::ComPtr<ID3D12Resource> DepthStencilBuffer;
 			D3D12_VIEWPORT Viewport;
+			Window* SwapChainWindow;
 		};
 
 	} 

@@ -11,7 +11,7 @@
 namespace Gamma {
 	namespace Direct3D12 {
 
-		Context::Context(void) : CurrentFencePoint(0), CurrentBackBufferIndex(0), RTVDescriptorSize(0), DSVDescriptorSize(0), CBV_SRV_UAVDescriptorSize(0) {}
+		Context::Context(void) : CurrentFencePoint(0), CurrentBackBufferIndex(0), RTVDescriptorSize(0), DSVDescriptorSize(0), CBV_SRV_UAVDescriptorSize(0), SwapChainWindow(NULL) {}
 
 		Context::Context(Window* window) : Context() {
 			Initialize(window);
@@ -19,9 +19,11 @@ namespace Gamma {
 
 		Context::~Context(void) {
 			FlushCommandQueue();
+			SwapChain->SetFullscreenState(FALSE, NULL);
 		}
 
 		void Context::Initialize(Window* window, uint32_t msaa_samples) {
+			SwapChainWindow = window;
 			CreateContext(window, msaa_samples);
 		}
 
@@ -34,12 +36,52 @@ namespace Gamma {
 			GAMMA_INFO("D3D12", "Created a ID3D12Debug");
 			DebugController->EnableDebugLayer();
 			#endif
-			Microsoft::WRL::ComPtr<IDXGIFactory4> DXGIFactory;
-			Result = CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)DXGIFactory.GetAddressOf());
+			DXGI_RATIONAL RefreshRate;
+			RefreshRate.Numerator = 60;
+			RefreshRate.Denominator = 1;
+			Microsoft::WRL::ComPtr<IDXGIFactory4> Factory;
+			Result = CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)Factory.GetAddressOf());
 			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGIFactory4, CreateDXGIFactory1 returned %#010x", Result);
 			GAMMA_INFO("D3D12", "Created a IDXGIFactory4");
+			Result = Factory->EnumAdapters(0, Adapter.GetAddressOf());
+			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGIAdapter, IDXGIFactory::EnumAdapters returned %#010x", Result);
+			GAMMA_INFO("D3D12", "Created a IDXGIAdapter");
+			Result = Adapter->EnumOutputs(0, Output.GetAddressOf());
+			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGIOutput, IDXGIAdapter::EnumOutputs returned %#010x", Result);
+			GAMMA_INFO("D3D12", "Created a IDXGIOutput");
+			DXGI_OUTPUT_DESC MonitorDesc = {};
+			Output->GetDesc(&MonitorDesc);
+			MONITORINFOEXW MonitorInfo;
+			MonitorInfo.cbSize = sizeof(MonitorInfo);
+			GetMonitorInfoW(MonitorDesc.Monitor, &MonitorInfo);
+			UINT32 RequiredPaths, RequiredModes;
+			GetDisplayConfigBufferSizes(QDC_ONLY_ACTIVE_PATHS, &RequiredPaths, &RequiredModes);
+			std::vector<DISPLAYCONFIG_PATH_INFO> PathsList(RequiredPaths);
+			std::vector<DISPLAYCONFIG_MODE_INFO> ModesList(RequiredModes);
+			QueryDisplayConfig(QDC_ONLY_ACTIVE_PATHS, &RequiredPaths, PathsList.data(), &RequiredModes, ModesList.data(), nullptr);
+			int32_t MonitorIndex = 0;
+			for (DISPLAYCONFIG_PATH_INFO PathInfo : PathsList) {
+				DISPLAYCONFIG_SOURCE_DEVICE_NAME SourceName;
+				SourceName.header.type = DISPLAYCONFIG_DEVICE_INFO_GET_SOURCE_NAME;
+				SourceName.header.size = sizeof(SourceName);
+				SourceName.header.adapterId = PathInfo.sourceInfo.adapterId;
+				SourceName.header.id = PathInfo.sourceInfo.id;
+				DisplayConfigGetDeviceInfo(&SourceName.header);
+				if (wcscmp(MonitorInfo.szDevice, SourceName.viewGdiDeviceName) == 0) {
+					RefreshRate.Numerator = PathInfo.targetInfo.refreshRate.Numerator;
+					RefreshRate.Denominator = PathInfo.targetInfo.refreshRate.Denominator;
+#ifdef GAMMA_DEBUG
+					DISPLAY_DEVICE DisplayDevice;
+					DisplayDevice.cb = sizeof(DisplayDevice);
+					EnumDisplayDevicesA(Win32::CreateRegularString(MonitorInfo.szDevice).c_str(), MonitorIndex, &DisplayDevice, 0);
+					GAMMA_INFO("D3D12", "Using %s for IDXGISwapChain", DisplayDevice.DeviceString);
+#endif
+					break;
+				}
+				MonitorIndex++;
+			}
 			// Create the ID3D12Device using the first adapter in the system
-			Result = D3D12CreateDevice(NULL, D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)Device.GetAddressOf());
+			Result = D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)Device.GetAddressOf());
 			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12Device, D3D12CreateDevice returned %#010x", Result);
 			GAMMA_INFO("D3D12", "Created a ID3D12Device");
 			D3D12_COMMAND_QUEUE_DESC CommandQueueDesc = {};
@@ -81,14 +123,13 @@ namespace Gamma {
 			MultisampleQualityLevels.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			MultisampleQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
 			Result = Device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, (void*)&MultisampleQualityLevels, sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
-			GAMMA_ASSERT_ERROR(Result == S_OK, "D3D12", "MSSA %ux is not supported, ID3D12Device::CheckFeatureSupport returned %#010x", msaa_samples, Result);
-			GAMMA_INFO("D3D12", "MSSA %ux is supported", msaa_samples);
+			GAMMA_ASSERT_ERROR(Result == S_OK, "D3D12", "MSAA %ux is not supported, ID3D12Device::CheckFeatureSupport returned %#010x", msaa_samples, Result);
+			GAMMA_INFO("D3D12", "MSAA %ux is supported", msaa_samples);
 			DXGI_SWAP_CHAIN_DESC SwapChainDesc = {}; 
 			SwapChainDesc.BufferDesc.Width = window->GetDimensions().Width;
 			SwapChainDesc.BufferDesc.Height = window->GetDimensions().Height;
 			SwapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			SwapChainDesc.BufferDesc.RefreshRate.Numerator = 60;
-			SwapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
+			SwapChainDesc.BufferDesc.RefreshRate = RefreshRate;
 			SwapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 			SwapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 			SwapChainDesc.SampleDesc.Count = MultisampleQualityLevels.SampleCount;
@@ -99,7 +140,7 @@ namespace Gamma {
 			SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 			SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-			Result = DXGIFactory->CreateSwapChain(CommandQueue.Get(), &SwapChainDesc, SwapChain.GetAddressOf());
+			Result = Factory->CreateSwapChain(CommandQueue.Get(), &SwapChainDesc, SwapChain.GetAddressOf());
 			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGISwapChain, IDXGIFactory::CreateSwapChain returned %#010x", Result);
 			GAMMA_INFO("D3D12", "Created a IDXGISwapChain");
 			// Create color buffers and RTVs
