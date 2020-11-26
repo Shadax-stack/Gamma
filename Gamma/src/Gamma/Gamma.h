@@ -27,73 +27,27 @@
 
 namespace Gamma {
 
-	namespace OpenGL {
-
+	namespace Direct3D12 {
 		enum class Version {
-			OGL_1_1,
-			OGL_1_2,
-			OGL_1_3,
-			OGL_1_4,
-			OGL_1_5,
-			OGL_2_0,
-			OGL_2_1,
-			OGL_3_0,
-			OGL_3_1,
-			OGL_3_2,
-			OGL_3_3,
-			OGL_4_0,
+			ULTIMATE
 		};
-
 	}
 
-	namespace Direct3D9 {
-
+	namespace Vulkan {
 		enum class Version {
-			DX9,
-			DX9a,
-			DX9b,
-			DX9c,
+			// TODO: Add versions here
 		};
-
-	}
-
-	namespace Direct3D10 {
-
-		enum class Version {
-			//TODO: Add versions for this API
-		};
-
-	}
-
-	namespace Direct3D11 {
-
-		enum class Version {
-			//TODO: Add versions for this API
-		};
-
 	}
 
 	GAMMA_API void GammaInit(void);
 	GAMMA_API void GammaQuit(void);
 
-#if defined(GAMMA_BUILD_OPENGL)
-	namespace Graphics = OpenGL;
-	#define Graphics OpenGL
-#elif defined(GAMMA_BUILD_VULKAN)
+#if defined(GAMMA_GRAPHICS_API_VULKAN)
 	namespace Graphics = Vulkan;
 	#define Graphics Vulkan
-#elif defined(GAMMA_BUILD_D3D9)
-	namespace Graphics = Direct3D9;
-	#define Graphics Direct3D9
-#elif defined(GAMMA_BUILD_D3D10)
-	namespace Graphics = Direct3D10;
-	#define Graphics Direct3D10
-#elif defined(GAMMA_BUILD_D3D11)
-	namespace Graphics = Direct3D11;
-	#define Graphics Direct3D11
-#elif defined(GAMMA_BUILD_D3D12)
-	namespace Graphics = Direct3D11;
-	#define Graphics Direct3D11
+#elif defined(GAMMA_GRAPHICS_API_D3D12)
+	namespace Graphics = Direct3D12;
+	#define Graphics Direct3D12
 #else
 	#error Please select a graphics API in CMake
 #endif

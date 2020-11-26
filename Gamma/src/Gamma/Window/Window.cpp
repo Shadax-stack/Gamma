@@ -23,14 +23,14 @@ namespace Gamma {
 		InternalWindow = SDL_CreateWindow(title, xpos, ypos, width, height, WINDOW_GRAPHICS_API_FLAG);
 		GAMMA_ASSERT(InternalWindow, "Fatal error in creating window: %s", SDL_GetError());
 		WindowID = SDL_GetWindowID(InternalWindow);
-		GAMMA_INFO("Created window %i of size %i by %i", WindowID, width, height);
+		GAMMA_INFO("WINDOW", "Created window %i of size %i by %i", WindowID, width, height);
 		
 		Dimensions.Width = (int)width;
 		Dimensions.Height = (int)height;
 	}
 
 	void Window::CloseWindow(void) {
-		GAMMA_INFO("Destroying window %i", WindowID);
+		GAMMA_INFO("WINDOW", "Destroying window %i", WindowID);
 		SDL_DestroyWindow(InternalWindow);
 	}
 

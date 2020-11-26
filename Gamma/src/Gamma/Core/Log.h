@@ -9,15 +9,21 @@
 #include "../Gamma.h"
 #include <stdint.h>
 #include <debug-trap/debug-trap.h>
+#ifdef GAMMA_MSVC
+#include <yvals.h>
+#include <crtdbg.h>
+#include <corecrt.h>
+#endif // GAMMA_MSVC
+
 
 namespace Gamma {
 
 	class GAMMA_API Logger {
 	public:
-		void Info(const char* fmt, ...);
-		void Warn(const char* fmt, ...);
-		void Error(const char* fmt, ...);
-		void Critical(const char* fmt, ...);
+		void Info(const char* source, const char* fmt, ...);
+		void Warn(const char* source, const char* fmt, ...);
+		void Error(const char* source, const char* fmt, ...);
+		void Critical(const char* source, const char* fmt, ...);
 	};
 
 #ifdef GAMMA_DEBUG
@@ -26,17 +32,24 @@ namespace Gamma {
 
 }
 
+#ifdef GAMMA_MSVC
+#include "../Win32/Debug.h"
+#define GAMMA_BREAK_POINT_ASSERT(source, msg, ...) {if(Gamma::Win32::DebugReport(__FILE__, __LINE__, source, msg, __VA_ARGS__)){psnip_trap();}}
+#else
+#define GAMMA_BREAK_POINT_ASSERT(msg, ...) {psnip_trap();}
+#endif
+
 #ifdef GAMMA_BUILD
 #ifdef GAMMA_DEBUG
 // Macros for logging in a debug build
-#define GAMMA_INFO(fmt, ...) Gamma::GlobalLogger.Info(fmt, __VA_ARGS__)
-#define GAMMA_WARN(fmt, ...) Gamma::GlobalLogger.Warn(fmt, __VA_ARGS__)
-#define GAMMA_ERROR(fmt, ...) Gamma::GlobalLogger.Error(fmt, __VA_ARGS__)
-#define GAMMA_CRITICAL(fmt, ...) Gamma::GlobalLogger.Critical(fmt, __VA_ARGS__)
-#define GAMMA_ASSERT_INFO(condition, fmt, ...) if(!(condition)) { GAMMA_INFO(fmt, __VA_ARGS__); psnip_trap(); }
-#define GAMMA_ASSERT_WARN(condition, fmt, ...) if(!(condition)) { GAMMA_WARN(fmt, __VA_ARGS__); psnip_trap(); }
-#define GAMMA_ASSERT_ERROR(condition, fmt, ...) if(!(condition)) { GAMMA_ERROR(fmt, __VA_ARGS__); psnip_trap(); }
-#define GAMMA_ASSERT_CRITICAL(condition, fmt, ...) if(!(condition)) { GAMMA_CRITICAL(fmt, __VA_ARGS__); psnip_trap(); }
+#define GAMMA_INFO(source, fmt, ...) Gamma::GlobalLogger.Info(source, fmt, __VA_ARGS__)
+#define GAMMA_WARN(source, fmt, ...) Gamma::GlobalLogger.Warn(source, fmt, __VA_ARGS__)
+#define GAMMA_ERROR(source, fmt, ...) Gamma::GlobalLogger.Error(source, fmt, __VA_ARGS__)
+#define GAMMA_CRITICAL(source, fmt, ...) Gamma::GlobalLogger.Critical(source, fmt, __VA_ARGS__)
+#define GAMMA_ASSERT_INFO(condition, source, fmt, ...) if(!(condition)) { GAMMA_INFO(source, fmt, __VA_ARGS__); GAMMA_BREAK_POINT_ASSERT(source, fmt, __VA_ARGS__); }
+#define GAMMA_ASSERT_WARN(condition, source, fmt, ...) if(!(condition)) { GAMMA_WARN(source, fmt, __VA_ARGS__); GAMMA_BREAK_POINT_ASSERT(source, fmt, __VA_ARGS__); }
+#define GAMMA_ASSERT_ERROR(condition, source, fmt, ...) if(!(condition)) { GAMMA_ERROR(source, fmt, __VA_ARGS__); GAMMA_BREAK_POINT_ASSERT(source, fmt, __VA_ARGS__); }
+#define GAMMA_ASSERT_CRITICAL(condition, source, fmt, ...) if(!(condition)) { GAMMA_CRITICAL(source, fmt, __VA_ARGS__); GAMMA_BREAK_POINT_ASSERT(source, fmt, __VA_ARGS__); }
 #define GAMMA_ASSERT GAMMA_ASSERT_CRITICAL
 #else
 // Generally we don't want any logging in a release or distribution build

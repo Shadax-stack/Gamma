@@ -23,39 +23,54 @@ namespace Gamma {
 		return CurrentTime;
 	}
 
-	void Logger::Info(const char* fmt, ...) {
-		
+	void Logger::Info(const char* source, const char* fmt, ...) {
+		const char* UnknownSource = "Unknown";
+		if (!source) {
+			source = UnknownSource;
+		}
 		va_list args;
 		va_start(args, fmt);
 		// Why 2 calls to printf? because this is a temporary solution and I will create my own logging library for this
-		printf("[%s] [GAMMA] Info: ", GetCurrentTime());
+		printf("[%s] [GAMMA] [%s] Info: ", GetCurrentTime(), source);
 		vprintf(fmt, args);
 		putchar('\n');
 		va_end(args);
 	}
 
-	void Logger::Warn(const char* fmt, ...) {
+	void Logger::Warn(const char* source, const char* fmt, ...) {
+		const char* UnknownSource = "Unknown";
+		if (!source) {
+			source = UnknownSource;
+		}
 		va_list args;
 		va_start(args, fmt);
-		printf("[%s] [GAMMA] Warn: ", GetCurrentTime());
+		printf("[%s] [GAMMA] [%s] Warn: ", GetCurrentTime(), source);
 		vprintf(fmt, args);
 		putchar('\n');
 		va_end(args);
 	}
 
-	void Logger::Error(const char* fmt, ...) {
+	void Logger::Error(const char* source, const char* fmt, ...) {
+		const char* UnknownSource = "Unknown";
+		if (!source) {
+			source = UnknownSource;
+		}
 		va_list args;
 		va_start(args, fmt);
-		printf("[%s] [GAMMA] Error: ", GetCurrentTime());
+		printf("[%s] [GAMMA] [%s] Error: ", GetCurrentTime(), source);
 		vprintf(fmt, args);
 		putchar('\n');
 		va_end(args);
 	}
 
-	void Logger::Critical(const char* fmt, ...) {
+	void Logger::Critical(const char* source, const char* fmt, ...) {
+		const char* UnknownSource = "Unknown";
+		if (!source) {
+			source = UnknownSource;
+		}
 		va_list args;
 		va_start(args, fmt);
-		printf("[%s] [GAMMA] Critical: ", GetCurrentTime());
+		printf("[%s] [GAMMA] [%s] Critical: ", GetCurrentTime(), source);
 		vprintf(fmt, args);
 		putchar('\n');
 		va_end(args);

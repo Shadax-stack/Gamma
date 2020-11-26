@@ -63,7 +63,8 @@ if(MSVC)
 endif(MSVC)
 
 if(GAMMA_GRAPHICS_API_VULKAN)
-	#do nothing for now
+	target_compile_definitions(Gamma PUBLIC "GAMMA_GRAPHICS_API_VULKAN")
 elseif(GAMMA_GRAPHICS_API_D3D12)
 	target_link_libraries(Gamma PRIVATE "d3d12" "dxgi" "d3dcompiler")
+	target_compile_definitions(Gamma PUBLIC "GAMMA_GRAPHICS_API_D3D12")
 endif(GAMMA_GRAPHICS_API_VULKAN)

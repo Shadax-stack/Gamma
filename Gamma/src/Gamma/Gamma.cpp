@@ -3,7 +3,6 @@
 // file 'LICENSE.txt', which is part of this source code package.
 #include "Gamma.h"
 #include <SDL.h>
-#include <GL/glew.h>
 #include <time.h>
 
 namespace Gamma {
@@ -13,8 +12,8 @@ namespace Gamma {
 #endif
 
 	namespace Graphics {
-		extern GAMMA_API void Gamma_Graphics_API_Init(void);
-		extern GAMMA_API void Gamma_Graphics_API_Quit(void);
+		extern void Gamma_Graphics_API_Init(void);
+		extern void Gamma_Graphics_API_Quit(void);
 	}
 
 	void GammaInit(void) {
