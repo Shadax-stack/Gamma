@@ -6,6 +6,7 @@
 #ifdef GAMMA_MSVC
 #pragma warning(disable : 26495)
 #pragma warning(disable : 26812)
+#pragma warning(disable : 6387)
 #endif
 
 namespace Gamma {
@@ -28,27 +29,18 @@ namespace Gamma {
 		}
 
 		void Context::CreateContext(Window* window, UINT msaa_samples) {
-			HRESULT Result;
 			#ifdef GAMMA_DEBUG
 			Microsoft::WRL::ComPtr<ID3D12Debug> DebugController;
-			Result = D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)DebugController.GetAddressOf());
-			GAMMA_ASSERT_ERROR(Result == S_OK, "D3D12", "Unable to create a ID3D12Debug, D3D12GetDebugInterface returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12Debug");
+			D3D12GetDebugInterface(__uuidof(ID3D12Debug), (void**)DebugController.GetAddressOf());
 			DebugController->EnableDebugLayer();
 			#endif
 			DXGI_RATIONAL RefreshRate;
 			RefreshRate.Numerator = 60;
 			RefreshRate.Denominator = 1;
 			Microsoft::WRL::ComPtr<IDXGIFactory4> Factory;
-			Result = CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)Factory.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGIFactory4, CreateDXGIFactory1 returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a IDXGIFactory4");
-			Result = Factory->EnumAdapters(0, Adapter.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGIAdapter, IDXGIFactory::EnumAdapters returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a IDXGIAdapter");
-			Result = Adapter->EnumOutputs(0, Output.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGIOutput, IDXGIAdapter::EnumOutputs returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a IDXGIOutput");
+			CreateDXGIFactory1(__uuidof(IDXGIFactory4), (void**)Factory.GetAddressOf());
+			Factory->EnumAdapters(0, Adapter.GetAddressOf());
+			Adapter->EnumOutputs(0, Output.GetAddressOf());
 			DXGI_OUTPUT_DESC MonitorDesc = {};
 			Output->GetDesc(&MonitorDesc);
 			MONITORINFOEXW MonitorInfo;
@@ -70,34 +62,18 @@ namespace Gamma {
 				if (wcscmp(MonitorInfo.szDevice, SourceName.viewGdiDeviceName) == 0) {
 					RefreshRate.Numerator = PathInfo.targetInfo.refreshRate.Numerator;
 					RefreshRate.Denominator = PathInfo.targetInfo.refreshRate.Denominator;
-#ifdef GAMMA_DEBUG
-					DISPLAY_DEVICE DisplayDevice;
-					DisplayDevice.cb = sizeof(DisplayDevice);
-					EnumDisplayDevicesA(Win32::CreateRegularString(MonitorInfo.szDevice).c_str(), MonitorIndex, &DisplayDevice, 0);
-					GAMMA_INFO("D3D12", "Using %s for IDXGISwapChain", DisplayDevice.DeviceString);
-#endif
 					break;
 				}
 				MonitorIndex++;
 			}
 			// Create the ID3D12Device using the first adapter in the system
-			Result = D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_11_0, __uuidof(ID3D12Device), (void**)Device.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12Device, D3D12CreateDevice returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12Device");
+			D3D12CreateDevice(Adapter.Get(), D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), (void**)Device.GetAddressOf());
 			D3D12_COMMAND_QUEUE_DESC CommandQueueDesc = {};
 			CommandQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-			Result = Device->CreateCommandQueue(&CommandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)CommandQueue.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12CommandQueue, ID3D12Device::CreateCommandQueue returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12CommandQueue");
-			Result = Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)CommandAllocator.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12CommandAllocator, ID3D12Device::CreateCommandAllocator returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12CommandAllocator");
-			Result = Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)CommandList.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12GraphicsCommandList, ID3D12Device::CreateCommandList returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12GraphicsCommandList");
-			Result = Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)Fence.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12Fence, ID3D12Device::CreateFence returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12Fence");
+			Device->CreateCommandQueue(&CommandQueueDesc, __uuidof(ID3D12CommandQueue), (void**)CommandQueue.GetAddressOf());
+			Device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, __uuidof(ID3D12CommandAllocator), (void**)CommandAllocator.GetAddressOf());
+			Device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, CommandAllocator.Get(), NULL, __uuidof(ID3D12GraphicsCommandList), (void**)CommandList.GetAddressOf());
+			Device->CreateFence(0, D3D12_FENCE_FLAG_NONE, __uuidof(ID3D12Fence), (void**)Fence.GetAddressOf());
 			RTVDescriptorSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
 			DSVDescriptorSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 			CBV_SRV_UAVDescriptorSize = Device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -107,24 +83,18 @@ namespace Gamma {
 			RTVDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 			RTVDescriptorHeapDesc.NodeMask = 0;
 			Device->CreateDescriptorHeap(&RTVDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)RTVDescriptorHeap.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a RTV ID3D12DescriptorHeap, ID3D12Device::CreateDescriptorHeap returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a RTV ID3D12DescriptorHeap");
 			D3D12_DESCRIPTOR_HEAP_DESC DSVDescriptorHeapDesc = {};
 			DSVDescriptorHeapDesc.NumDescriptors = 1;
 			DSVDescriptorHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
 			DSVDescriptorHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 			DSVDescriptorHeapDesc.NodeMask = 0;
-			Result = Device->CreateDescriptorHeap(&DSVDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)DSVDescriptorHeap.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a DSV ID3D12DescriptorHeap, ID3D12Device::CreateDescriptorHeap returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a DSV ID3D12DescriptorHeap");
+			Device->CreateDescriptorHeap(&DSVDescriptorHeapDesc, __uuidof(ID3D12DescriptorHeap), (void**)DSVDescriptorHeap.GetAddressOf());
 			D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS MultisampleQualityLevels;
 			MultisampleQualityLevels.SampleCount = msaa_samples;
 			MultisampleQualityLevels.NumQualityLevels = 0;
 			MultisampleQualityLevels.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 			MultisampleQualityLevels.Flags = D3D12_MULTISAMPLE_QUALITY_LEVELS_FLAG_NONE;
-			Result = Device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, (void*)&MultisampleQualityLevels, sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
-			GAMMA_ASSERT_ERROR(Result == S_OK, "D3D12", "MSAA %ux is not supported, ID3D12Device::CheckFeatureSupport returned %#010x", msaa_samples, Result);
-			GAMMA_INFO("D3D12", "MSAA %ux is supported", msaa_samples);
+			Device->CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, (void*)&MultisampleQualityLevels, sizeof(D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS));
 			DXGI_SWAP_CHAIN_DESC SwapChainDesc = {}; 
 			SwapChainDesc.BufferDesc.Width = window->GetDimensions().Width;
 			SwapChainDesc.BufferDesc.Height = window->GetDimensions().Height;
@@ -140,15 +110,11 @@ namespace Gamma {
 			SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 			SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 			SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-			Result = Factory->CreateSwapChain(CommandQueue.Get(), &SwapChainDesc, SwapChain.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a IDXGISwapChain, IDXGIFactory::CreateSwapChain returned %#010x", Result);
-			GAMMA_INFO("D3D12", "Created a IDXGISwapChain");
+			Factory->CreateSwapChain(CommandQueue.Get(), &SwapChainDesc, SwapChain.GetAddressOf());
 			// Create color buffers and RTVs
 			D3D12_CPU_DESCRIPTOR_HANDLE RTVHeapBase = RTVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 			for (UINT index = 0; index < GAMMA_D3D12_SWAP_CHAIN_BUFFER_COUNT; index++) {
-				Result = SwapChain->GetBuffer(index, __uuidof(ID3D12Resource), (void**)SwapChainBuffers[index].GetAddressOf());
-				GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create ID3D12Resource[%u], IDXGISwapChain::GetBuffer returned %#010x", index, Result);
-				GAMMA_INFO("D3D12", "Created ID3D12Resource[%u]", index);
+				SwapChain->GetBuffer(index, __uuidof(ID3D12Resource), (void**)SwapChainBuffers[index].GetAddressOf());
 				Device->CreateRenderTargetView(SwapChainBuffers[index].Get(), NULL, { RTVHeapBase.ptr + (UINT64)index * RTVDescriptorSize });
 			}
 			// Create depth-stencil buffer and DSV
@@ -172,9 +138,7 @@ namespace Gamma {
 			DepthStencilClearValue.Format = DepthStencilDesc.Format;
 			DepthStencilClearValue.DepthStencil.Depth = 1.0;
 			DepthStencilClearValue.DepthStencil.Stencil = 0;
-			Result = Device->CreateCommittedResource(&DepthStencilHeapProperties, D3D12_HEAP_FLAG_NONE, &DepthStencilDesc, D3D12_RESOURCE_STATE_COMMON, &DepthStencilClearValue, __uuidof(ID3D12Resource), (void**)DepthStencilBuffer.GetAddressOf());
-			GAMMA_ASSERT_CRITICAL(Result == S_OK, "D3D12", "Unable to create a ID3D12Resource, ID3D12Device::CreateCommittedResource returned %#010x",  Result);
-			GAMMA_INFO("D3D12", "Created a ID3D12Resource");
+			Device->CreateCommittedResource(&DepthStencilHeapProperties, D3D12_HEAP_FLAG_NONE, &DepthStencilDesc, D3D12_RESOURCE_STATE_COMMON, &DepthStencilClearValue, __uuidof(ID3D12Resource), (void**)DepthStencilBuffer.GetAddressOf());
 			Device->CreateDepthStencilView(DepthStencilBuffer.Get(), NULL, DepthStencilDSV());
 			CommandList->ResourceBarrier(1, &CreateResourceBarrierTransition(DepthStencilBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_DEPTH_WRITE));
 			Viewport.TopLeftX = 0.0f;
@@ -187,27 +151,20 @@ namespace Gamma {
 			CommandList->Close();
 			ID3D12CommandList* CommandLists[] = { CommandList.Get() };
 			CommandQueue->ExecuteCommandLists(sizeof(CommandLists) / sizeof(ID3D12CommandList*), CommandLists);
+			FlushCommandQueue();
 			GAMMA_INFO("D3D12", "Done initializing D3D12");
 		}
 
 		// Mainly based off Frank Luna's DX12 book
 		void Context::FlushCommandQueue(void) {
-			HRESULT Result;
 			CurrentFencePoint++;
-			Result = CommandQueue->Signal(Fence.Get(), CurrentFencePoint);
+			CommandQueue->Signal(Fence.Get(), CurrentFencePoint);
 			// Thankfully we can use events so we don't have to put a while loop here
 			if (Fence->GetCompletedValue() < CurrentFencePoint) {
 				HANDLE FenceEvent = CreateEventEx(NULL, NULL, 0, EVENT_ALL_ACCESS);
-				// Then we may fall back to brute force methods if we were not able to create a handle
-				GAMMA_ASSERT_CRITICAL(FenceEvent != NULL, "D3D12", "CreateEventEx returned NULL. The program will not be able to wait for the fence event. Last error on this thread: %#010x", GetLastError());
 				Fence->SetEventOnCompletion(CurrentFencePoint, FenceEvent);
-				DWORD FenceResult = WaitForSingleObject(FenceEvent, 10000); // Wait ten seconds
-				if (FenceResult != WAIT_OBJECT_0) {
-					// Something is very wrong if the GPU has not flushed the queue within 10 seconds
-					GAMMA_CRITICAL("D3D12", "The fence event did not become signaled after 10 seconds, WaitForSingleObject returned %#010x", FenceResult);
-					psnip_trap();
-				}
-				CloseHandle(FenceEvent);
+				WaitForSingleObject(FenceEvent, INFINITE);
+				//CloseHandle(FenceEvent);
 			}
 		}
 
@@ -225,27 +182,6 @@ namespace Gamma {
 
 		D3D12_CPU_DESCRIPTOR_HANDLE Context::DepthStencilDSV(void) {
 			return DSVDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		}
-
-		void Context::EndFrame(void) {
-			CommandList->ResourceBarrier(1, &CreateResourceBarrierTransition(SwapChainBuffers[CurrentBackBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-			CommandList->Close();
-			ID3D12CommandList* CommandLists[] = { CommandList.Get() };
-			CommandQueue->ExecuteCommandLists(sizeof(CommandLists) / sizeof(ID3D12CommandList*), CommandLists);
-			FlushCommandQueue();
-			CommandAllocator->Reset();
-			SwapChain->Present(0, 0);
-			CurrentBackBufferIndex = (CurrentBackBufferIndex+1) % GAMMA_D3D12_SWAP_CHAIN_BUFFER_COUNT;
-		}
-
-		void Context::NewFrame(void) {
-			const static float Black[4] = { 0.0f };
-			CommandList->Reset(CommandAllocator.Get(), NULL);
-			CommandList->ResourceBarrier(1, &CreateResourceBarrierTransition(SwapChainBuffers[CurrentBackBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
-			CommandList->RSSetViewports(1, &Viewport);
-			CommandList->ClearRenderTargetView(CurrentBackBufferRTV(), Black, 0, NULL);
-			CommandList->ClearDepthStencilView(DepthStencilDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, NULL);
-			CommandList->OMSetRenderTargets(1, &CurrentBackBufferRTV(), TRUE, &DepthStencilDSV());
 		}
 
 		D3D12_RESOURCE_BARRIER Context::CreateResourceBarrierTransition(ID3D12Resource* resource, D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after, UINT subresource, D3D12_RESOURCE_BARRIER_FLAGS flags) {

@@ -1,6 +1,5 @@
 #include <Gamma/Gamma.h>
 #include <Gamma/Window/Window.h>
-#include <Gamma/Renderer/Direct3D12/Context.h>
 #include <iostream>
 
 using namespace Gamma;
@@ -13,16 +12,9 @@ using namespace Gamma::Graphics;
 int main() {
 	GammaInit();
 	WindowClass WndClass;
-	WndClass.FullscreenState = FullscreenState::FULLSCREEN;
+	WndClass.FullscreenState = FullscreenState::WINDOWED;
 	Window Window;
-	Window.OpenWindow(WndClass, "Gamma");
-	Context Context;
-	Context.Initialize(&Window);
-	while (!Window.ShouldClose()) {
-		Context.NewFrame();
-		Context.EndFrame();
-		Window.PollEvents();
-	}
+	Window.OpenWindow(WndClass, "Gamma", 640, 480);
 	Window.CloseWindow();
 	GammaQuit();
 	return 0;

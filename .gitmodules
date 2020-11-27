@@ -8,3 +8,6 @@
 	path = vendor/portable-snippets
 	url = https://github.com/nemequ/portable-snippets
 
+[submodule "vendor/VkBootstrap"]
+	path = vendor/VkBootstrap
+	url = https://github.com/charles-lunarg/vk-bootstrap

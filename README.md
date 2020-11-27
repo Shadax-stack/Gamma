@@ -6,6 +6,7 @@ First clone the repo into a directory. Then, in that directory, run cmake. Here 
 - `GAMMA_BUILD_EXAMPLES`: Build the example projects. Off by default.
 - `GAMMA_GRAPHICS_API_D3D12`: Build Gamma using the D3D12 API. Will be on by default on Windows 10 or 8/8.1
 - `GAMMA_GRAPHICS_API_VULKAN`: Build Gamma using the Vulkan API. Will be off by default on platforms in which `GAMMA_GRAPHICS_API_D3D12` is turned on by default
+If you are building for Vulkan, make sure you have the LunarG SDK installed, you can get it here: https://vulkan.lunarg.com/sdk/home 
 ## Supported Graphics APIs
 Currently there are not any, check the ogl-d3d9-10-11 branch for legacy API support. The engine is transitioning to D3D12 and Vulkan. Support for legacy APIs may be added later after D3D12 and Vulkan.
 Future API support roadmap:

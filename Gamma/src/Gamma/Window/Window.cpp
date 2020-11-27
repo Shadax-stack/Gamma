@@ -5,6 +5,9 @@
 #include "../Core/Log.h"
 #include <iostream>
 #include <vector>
+#ifdef GAMMA_GRAPHICS_API_VULKAN
+#include <SDL_vulkan.h>
+#endif
 
 namespace Gamma {
 
@@ -34,6 +37,9 @@ namespace Gamma {
 		default:
 			break;
 		}
+		#ifdef GAMMA_GRAPHICS_API_VULKAN
+		Flags |= SDL_WINDOW_VULKAN;
+		#endif
 		return Flags;
 	}
 
@@ -60,7 +66,6 @@ namespace Gamma {
 		GAMMA_ASSERT(InternalWindow, "Fatal error in creating window: %s", SDL_GetError());
 		WindowID = SDL_GetWindowID(InternalWindow);
 		GAMMA_INFO("WINDOW", "Created window %i of size %i by %i", WindowID, width, height);
-		
 		Dimensions.Width = (int)width;
 		Dimensions.Height = (int)height;
 	}

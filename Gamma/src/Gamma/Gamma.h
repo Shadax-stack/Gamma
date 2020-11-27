@@ -45,7 +45,7 @@ namespace Gamma {
 #if defined(GAMMA_GRAPHICS_API_VULKAN)
 	namespace Graphics = Vulkan;
 	#define Graphics Vulkan
-#elif defined(GAMMA_GRAPHICS_API_D3D12)
+#elif defined(GAMMA_GRAPHICS_API_DIRECT3D12)
 	namespace Graphics = Direct3D12;
 	#define Graphics Direct3D12
 #else
@@ -53,26 +53,5 @@ namespace Gamma {
 #endif
 
 }
-
-/*
-Include template:
-
-#if defined(GAMMA_BUILD_OPENGL)
-
-#elif defined(GAMMA_BUILD_VULKAN)
-
-#elif defined(GAMMA_BUILD_D3D9)
-
-#elif defined(GAMMA_BUILD_D3D10)
-
-#elif defined(GAMMA_BUILD_D3D11)
-
-#elif defined(GAMMA_BUILD_D3D12)
-
-#else
-	#error Please select a graphics API in CMake
-#endif
-
-*/
 
 #endif

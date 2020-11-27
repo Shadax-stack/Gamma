@@ -27,8 +27,8 @@ namespace Gamma {
 		gmt = mktime(&TimeInfo);
 		TimeOffset = local - gmt;
 #endif
-		Graphics::Gamma_Graphics_API_Init();
 		int Result = SDL_VideoInit(NULL);
+		Graphics::Gamma_Graphics_API_Init();
 		GAMMA_ASSERT_CRITICAL(Result == 0, "CORE", "Unable to initialize SDL2 video subsystem: %s", SDL_GetError());
 	}
 

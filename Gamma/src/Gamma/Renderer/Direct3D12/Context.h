@@ -19,8 +19,6 @@ namespace Gamma {
 			Context(Window* window);
 			~Context(void);
 			void Initialize(Window* window, uint32_t msaa_samples = 1);
-			void EndFrame(void);
-			void NewFrame(void);
 		private:
 			void CreateContext(Window* window, UINT msaa_samples);
 			D3D12_CPU_DESCRIPTOR_HANDLE CurrentFrontBufferRTV(void);
@@ -47,9 +45,13 @@ namespace Gamma {
 			Microsoft::WRL::ComPtr<ID3D12Resource> DepthStencilBuffer;
 			D3D12_VIEWPORT Viewport;
 			Window* SwapChainWindow;
+			friend class Renderer;
 		};
 
-	} 
+	}
+
+	namespace D3D12 = Direct3D12;
+
 }
 
 #endif // !GAMMA_DIRECT3D12_CONTEXT_H
