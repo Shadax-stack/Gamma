@@ -12,8 +12,9 @@ namespace Gamma {
 		VkInstance Instance = nullptr; 
 		std::vector<const char*> SupportedRequestedLayers;
 
+		// This function is called when the engine in initialized
+		// It is called after SDL_VideoInit()
 		void Gamma_Graphics_API_Init(void) {
-			// TODO: Find a better way to do this without using 10000 vectors and allocations 
 			const std::vector<const char*> DefaultLayers = {
 			#ifdef GAMMA_DEBUG
 				"VK_LAYER_KHRONOS_validation",
@@ -26,11 +27,11 @@ namespace Gamma {
 			// I may go through the SDL_(platform)vulkan.c files to get the platform specific surface exts 
 			const char* DefaultExtensions[] = {
 				"VK_KHR_surface",
-#if defined(GAMMA_PLATFORM_WINDOWS)
+				#if defined(GAMMA_PLATFORM_WINDOWS)
 				"VK_KHR_win32_surface",
-#elif defined(GAMMA_PLATFORM_MACOS)
-#elif defined(GAMMA_PLATFORM_LINUX)
-#endif
+				#elif defined(GAMMA_PLATFORM_MACOS)
+				#elif defined(GAMMA_PLATFORM_LINUX)
+				#endif
 			};
 			uint32_t SupportedLayerCount = 0;
 			vkEnumerateInstanceLayerProperties(&SupportedLayerCount, nullptr);
