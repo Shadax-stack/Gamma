@@ -3,6 +3,7 @@
 
 #include "../../Gamma.h"
 #include "Instance.h"
+#include "SwapChain.h"
 #include <vulkan/vulkan.h>
 
 namespace Gamma {
@@ -11,10 +12,15 @@ namespace Gamma {
 
 		class GAMMA_API Device {
 		public:
-			void Initialize(void);
+			void Create(SwapChain* swapchain);
+			void Destroy(void);
+			operator VkPhysicalDeviceProperties(void);
+			operator VkPhysicalDeviceFeatures(void);
 		private:
 			VkDevice Device;
 			VkPhysicalDevice PhysicalDevice;
+			VkQueue GraphicsQueue;
+			VkQueue PresentQueue;
 		};
 
 	}

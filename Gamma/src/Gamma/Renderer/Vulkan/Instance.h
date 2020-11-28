@@ -3,6 +3,7 @@
 
 #include "../../Gamma.h"
 #include <vulkan/vulkan.h>
+#include <vector>
 
 namespace Gamma {
 
@@ -10,6 +11,7 @@ namespace Gamma {
 
 		// The global instance that Gamma engine should use
 		extern VkInstance Instance;
+		extern std::vector<const char*> SupportedRequestedLayers;
 
 	}
 

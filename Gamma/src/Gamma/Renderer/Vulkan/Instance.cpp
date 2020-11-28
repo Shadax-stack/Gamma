@@ -10,6 +10,7 @@ namespace Gamma {
 	namespace Vulkan {
 
 		VkInstance Instance = nullptr; 
+		std::vector<const char*> SupportedRequestedLayers;
 
 		void Gamma_Graphics_API_Init(void) {
 			// TODO: Find a better way to do this without using 10000 vectors and allocations 
@@ -19,15 +20,22 @@ namespace Gamma {
 				"VK_LAYER_LUNARG_standard_validation",
 			#endif
 			};
-			uint32_t WindowExtensionCount = 0;
-			SDL_Vulkan_GetInstanceExtensions(nullptr, &WindowExtensionCount, nullptr);
-			std::vector<const char*> WindowExtensions(WindowExtensionCount);
-			SDL_Vulkan_GetInstanceExtensions(nullptr, nullptr, WindowExtensions.data());
+			// TODO: Add the exts for other platforms 
+			// The Reason why I hardcode the window exts is because the exts returned by SDL2 are hardcoded as well
+			// However SDL2 won't return the values unless you have created a window and stuff and it became a debugging nightmare
+			// I may go through the SDL_(platform)vulkan.c files to get the platform specific surface exts 
+			const char* DefaultExtensions[] = {
+				"VK_KHR_surface",
+#if defined(GAMMA_PLATFORM_WINDOWS)
+				"VK_KHR_win32_surface",
+#elif defined(GAMMA_PLATFORM_MACOS)
+#elif defined(GAMMA_PLATFORM_LINUX)
+#endif
+			};
 			uint32_t SupportedLayerCount = 0;
 			vkEnumerateInstanceLayerProperties(&SupportedLayerCount, nullptr);
 			std::vector<VkLayerProperties> SupportedLayers(SupportedLayerCount);
 			vkEnumerateInstanceLayerProperties(&SupportedLayerCount, SupportedLayers.data());
-			std::vector<const char*> SupportedRequestedLayers;
 			for (const char* RequestedLayer : DefaultLayers) {
 				for (VkLayerProperties SupportedLayer : SupportedLayers) {
 					if (!strcmp(RequestedLayer, SupportedLayer.layerName)) {
@@ -35,6 +43,9 @@ namespace Gamma {
 						break;
 					}
 				}
+			}
+			for (int index = 0; index < ARRAY_SIZE(DefaultExtensions); index++) {
+				printf("%s\n", DefaultExtensions[index]);
 			}
 			VkApplicationInfo ApplicationInfo = {};
 			ApplicationInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -48,9 +59,8 @@ namespace Gamma {
 			InstanceCreateInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 			InstanceCreateInfo.pNext = nullptr;
 			InstanceCreateInfo.pApplicationInfo = &ApplicationInfo;
-			InstanceCreateInfo.enabledLayerCount = 0;
-			InstanceCreateInfo.enabledExtensionCount = WindowExtensions.size();
-			InstanceCreateInfo.ppEnabledLayerNames = WindowExtensions.data();
+			InstanceCreateInfo.enabledExtensionCount = ARRAY_SIZE(DefaultExtensions);
+			InstanceCreateInfo.ppEnabledLayerNames = DefaultExtensions;
 			InstanceCreateInfo.enabledLayerCount = SupportedRequestedLayers.size();
 			InstanceCreateInfo.ppEnabledLayerNames = SupportedRequestedLayers.data();
 			vkCreateInstance(&InstanceCreateInfo, nullptr, &Instance);

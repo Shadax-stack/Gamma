@@ -1,5 +1,8 @@
 #include <Gamma/Gamma.h>
 #include <Gamma/Window/Window.h>
+#include <Gamma/Renderer/Vulkan/Device.h>
+#include <Gamma/Renderer/Vulkan/SwapChain.h>
+
 #include <iostream>
 
 using namespace Gamma;
@@ -15,6 +18,12 @@ int main() {
 	WndClass.FullscreenState = FullscreenState::WINDOWED;
 	Window Window;
 	Window.OpenWindow(WndClass, "Gamma", 640, 480);
+	SwapChain SwapChain;
+	SwapChain.Create(&Window);
+	Device Device;
+	Device.Create(&SwapChain);
+	Device.Destroy();
+	SwapChain.Destroy();
 	Window.CloseWindow();
 	GammaQuit();
 	return 0;

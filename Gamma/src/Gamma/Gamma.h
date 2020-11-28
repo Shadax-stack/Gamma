@@ -54,4 +54,6 @@ namespace Gamma {
 
 }
 
+#define ARRAY_SIZE(stackarray) (sizeof(stackarray) / sizeof(stackarray[0]))
+
 #endif

@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <time.h>
 #include "Core/Log.h"
+#include <iostream>
 
 namespace Gamma {
 
@@ -27,7 +28,7 @@ namespace Gamma {
 		gmt = mktime(&TimeInfo);
 		TimeOffset = local - gmt;
 #endif
-		int Result = SDL_VideoInit(NULL);
+		int Result = SDL_VideoInit(nullptr);
 		Graphics::Gamma_Graphics_API_Init();
 		GAMMA_ASSERT_CRITICAL(Result == 0, "CORE", "Unable to initialize SDL2 video subsystem: %s", SDL_GetError());
 	}
