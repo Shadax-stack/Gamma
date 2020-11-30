@@ -1,32 +1,40 @@
 #include "SwapChain.h"
 #include "Instance.h"
-#ifdef GAMMA_PLATFORM_WINDOWS
-#include <Windows.h>
-#include <vulkan/vulkan_win32.h>
-#include "../../Win32/Direct3DUtils.h"
-#endif
+#include <SDL_vulkan.h>
+#include <iostream>
 
 namespace Gamma {
 	namespace Vulkan {
 
-		// TODO: Add cross-platform surface creation support
-		void SwapChain::Create(Window* window) {
-#ifdef GAMMA_PLATFORM_WINDOWS
-			VkWin32SurfaceCreateInfoKHR SurfaceCreateInfo = {};
-			SurfaceCreateInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
-			SurfaceCreateInfo.pNext = nullptr;
-			SurfaceCreateInfo.hwnd = Win32::GetWindowHandle(window);
-			SurfaceCreateInfo.hinstance = GetModuleHandle(NULL);
-			vkCreateWin32SurfaceKHR(Instance, &SurfaceCreateInfo, NULL, &Surface);
-#endif
+		void SwapChain::CreateSurface(Window* window) {
+			// SDL2 provices a cross platform surface creation function
+			SDL_Window* InternalWindow = window->GetInternalWindow();
+			SDL_Vulkan_CreateSurface(InternalWindow, Instance, &Surface);
+			int32_t w, h;
+			SDL_Vulkan_GetDrawableSize(InternalWindow, &w, &h);
+			DrawableSize.width = w;
+			DrawableSize.height = h;
+		}
+
+		void SwapChain::Create(VkDevice device, VkSwapchainCreateInfoKHR createinfo) {
+			Device = device;
+			vkCreateSwapchainKHR(Device, &createinfo, nullptr, &SwapChain);
 		}
 
 		void SwapChain::Destroy(void) {
-			vkDestroySurfaceKHR(Instance, Surface, nullptr);
+			{
+				vkDestroySwapchainKHR(Device, SwapChain, nullptr);
+			}
+				vkDestroySurfaceKHR(Instance, Surface, nullptr);
+			
 		}
 
 		VkSurfaceKHR SwapChain::GetSurface(void) {
 			return Surface;
+		}
+
+		VkExtent2D SwapChain::GetDrawableSize(void) {
+			return DrawableSize;
 		}
 
 	}

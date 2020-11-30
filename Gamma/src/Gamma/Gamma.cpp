@@ -18,6 +18,10 @@ namespace Gamma {
 		extern void Gamma_Graphics_API_Quit(void);
 	}
 
+	void SDL_LogOutputFunction(void* userdata, int category, SDL_LogPriority priority, const char* message) {
+		GAMMA_INFO("SDL2", "%s", message);
+	}
+
 	void GammaInit(void) {
 #ifdef GAMMA_DEBUG
 		time_t local, gmt, now = time(nullptr);
@@ -28,9 +32,9 @@ namespace Gamma {
 		gmt = mktime(&TimeInfo);
 		TimeOffset = local - gmt;
 #endif
-		int Result = SDL_VideoInit(nullptr);
+		SDL_VideoInit(nullptr);
+		SDL_LogSetOutputFunction(SDL_LogOutputFunction, nullptr);
 		Graphics::Gamma_Graphics_API_Init();
-		GAMMA_ASSERT_CRITICAL(Result == 0, "CORE", "Unable to initialize SDL2 video subsystem: %s", SDL_GetError());
 	}
 
 	void GammaQuit(void) {

@@ -11,11 +11,16 @@ namespace Gamma {
 
 		class GAMMA_API SwapChain {
 		public:
-			void Create(Window* window);
+			void CreateSurface(Window* window);
+			void Create(VkDevice device, VkSwapchainCreateInfoKHR createinfo);
 			void Destroy(void);
 			VkSurfaceKHR GetSurface(void);
+			VkExtent2D GetDrawableSize(void);
 		private:
 			VkSurfaceKHR Surface;
+			VkSwapchainKHR SwapChain;
+			VkDevice Device;
+			VkExtent2D DrawableSize;
 		};
 
 	}
